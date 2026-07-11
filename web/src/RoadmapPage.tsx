@@ -111,6 +111,7 @@ export function RoadmapPage() {
   const [roadmapReload, setRoadmapReload] = useState(0)
   const [showDirectionForm, setShowDirectionForm] = useState(false)
   const [newNodeParent, setNewNodeParent] = useState<number | null | undefined>(undefined)
+  const [topicFullscreen, setTopicFullscreen] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -177,7 +178,10 @@ export function RoadmapPage() {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (newNodeParent !== undefined) {
+        if (topicFullscreen) {
+          event.preventDefault()
+          setTopicFullscreen(false)
+        } else if (newNodeParent !== undefined) {
           event.preventDefault()
           setNewNodeParent(undefined)
         } else if (showDirectionForm) {
@@ -205,7 +209,14 @@ export function RoadmapPage() {
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [direction, directionId, newNodeParent, selectedNodeId, showDirectionForm])
+  }, [direction, directionId, newNodeParent, selectedNodeId, showDirectionForm, topicFullscreen])
+
+  useEffect(() => {
+    if (!topicFullscreen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previousOverflow }
+  }, [topicFullscreen])
 
   const selectDirection = (id: number) => {
     // A click on the active direction is a no-op: changing search params here
@@ -214,6 +225,7 @@ export function RoadmapPage() {
     setDirectionId(id)
     setNodes([])
     setSelectedNodeId(null)
+    setTopicFullscreen(false)
     setSearchParams({ direction: String(id) })
   }
 
@@ -359,7 +371,14 @@ export function RoadmapPage() {
               action={<button className="button primary" type="button" onClick={() => setNewNodeParent(null)}>Добавить тему</button>}
             />
           ) : (
-            <RoadmapTree nodes={nodes} selectedId={selectedNodeId} onSelect={(node) => setSelectedNodeId(node.id)} />
+            <RoadmapTree
+              nodes={nodes}
+              selectedId={selectedNodeId}
+              onSelect={(node) => {
+                setSelectedNodeId(node.id)
+                setTopicFullscreen(false)
+              }}
+            />
           )}
         </div>
       </div>
@@ -370,12 +389,15 @@ export function RoadmapPage() {
             key={selectedNode.id}
             node={selectedNode}
             allNodes={flattenNodes(nodes)}
+            expanded={topicFullscreen}
+            onToggleFullscreen={() => setTopicFullscreen((value) => !value)}
             onAddChild={() => setNewNodeParent(selectedNode.id)}
             onSaved={(updated) => setNodes((items) => replaceNode(items, updated))}
             onDependenciesChanged={() => setRoadmapReload((value) => value + 1)}
             onDeleted={(id) => {
               setNodes((items) => removeNode(items, id))
               setSelectedNodeId(null)
+              setTopicFullscreen(false)
             }}
           />
         ) : (
@@ -554,6 +576,8 @@ function NodeForm({
 function NodeDetails({
   node,
   allNodes,
+  expanded,
+  onToggleFullscreen,
   onAddChild,
   onSaved,
   onDependenciesChanged,
@@ -561,6 +585,8 @@ function NodeDetails({
 }: {
   node: RoadmapNode
   allNodes: RoadmapNode[]
+  expanded: boolean
+  onToggleFullscreen: () => void
   onAddChild: () => void
   onSaved: (node: RoadmapNode) => void
   onDependenciesChanged: () => void
@@ -644,31 +670,54 @@ function NodeDetails({
   )
 
   return (
-    <form className="details-form topic-card" onSubmit={submit}>
-      <div className="topic-hero">
-        <div className={`topic-icon topic-icon-${node.node_type}`}>
-          <Icon name={nodeTypeIcons[node.node_type]} size={23} />
-        </div>
-        <div className="topic-hero-copy">
-          <span className="topic-kicker">Карточка обучения</span>
-          <div className="topic-state-row">
-            <span className={`status-badge status-${node.status}`}>{statusLabels[node.status]}</span>
-            {node.needs_review && <span className="review-badge">Повторить</span>}
+    <div
+      className={expanded ? 'topic-fullscreen-shell' : undefined}
+      role={expanded ? 'dialog' : undefined}
+      aria-modal={expanded ? true : undefined}
+      aria-labelledby={expanded ? `topic-title-${node.id}` : undefined}
+    >
+      {expanded && (
+        <button
+          className="topic-fullscreen-backdrop"
+          type="button"
+          aria-label="Закрыть полноэкранную карточку"
+          onClick={onToggleFullscreen}
+        />
+      )}
+      <form className={`details-form topic-card${expanded ? ' topic-card-expanded' : ''}`} onSubmit={submit}>
+        <div className="topic-hero">
+          <div className={`topic-icon topic-icon-${node.node_type}`}>
+            <Icon name={nodeTypeIcons[node.node_type]} size={23} />
           </div>
+          <div className="topic-hero-copy">
+            <span className="topic-kicker">Карточка обучения</span>
+            <div className="topic-state-row">
+              <span className={`status-badge status-${node.status}`}>{statusLabels[node.status]}</span>
+              {node.needs_review && <span className="review-badge">Повторить</span>}
+            </div>
+          </div>
+          <div
+            className="topic-ring"
+            style={{ background: `conic-gradient(var(--accent) ${statusReadiness[node.status] * 3.6}deg, var(--panel-strong) 0)` }}
+            role="img"
+            aria-label={`Готовность темы ${statusReadiness[node.status]}%`}
+          >
+            <span><strong>{statusReadiness[node.status]}%</strong><small>готово</small></span>
+          </div>
+          <button
+            className="icon-button topic-expand-button"
+            type="button"
+            aria-label={expanded ? 'Свернуть карточку' : 'Развернуть карточку на весь экран'}
+            title={expanded ? 'Свернуть карточку' : 'На весь экран'}
+            onClick={onToggleFullscreen}
+          >
+            <Icon name={expanded ? 'compress' : 'expand'} size={16} />
+          </button>
         </div>
-        <div
-          className="topic-ring"
-          style={{ background: `conic-gradient(var(--accent) ${statusReadiness[node.status] * 3.6}deg, var(--panel-strong) 0)` }}
-          role="img"
-          aria-label={`Готовность темы ${statusReadiness[node.status]}%`}
-        >
-          <span><strong>{statusReadiness[node.status]}%</strong><small>готово</small></span>
-        </div>
-      </div>
 
       <div className="details-heading">
         <p className="eyebrow">{nodeTypeLabels[node.node_type]}</p>
-        <h2>{node.title}</h2>
+        <h2 id={`topic-title-${node.id}`}>{node.title}</h2>
       </div>
 
       <section className="topic-study" aria-labelledby={`topic-study-${node.id}`}>
@@ -798,8 +847,9 @@ function NodeDetails({
 
       <button className="button primary full" type="submit" disabled={saving}>{saving ? 'Сохраняем…' : 'Сохранить изменения'}</button>
       <button className="button secondary full" type="button" onClick={onAddChild}><Icon name="plus" size={16} /> Добавить вложенную тему</button>
-      <button className="danger-button" type="button" onClick={remove} disabled={deleting}>{deleting ? 'Удаляем…' : 'Удалить тему'}</button>
-    </form>
+        <button className="danger-button" type="button" onClick={remove} disabled={deleting}>{deleting ? 'Удаляем…' : 'Удалить тему'}</button>
+      </form>
+    </div>
   )
 }
 

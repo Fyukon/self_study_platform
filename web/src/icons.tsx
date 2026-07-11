@@ -9,7 +9,9 @@ export type IconName =
   | 'chevron-down'
   | 'chevron-right'
   | 'close'
+  | 'compress'
   | 'compass'
+  | 'expand'
   | 'home'
   | 'journal'
   | 'moon'
@@ -70,6 +72,10 @@ export function Icon({ name, size = 18, strokeWidth = 1.8, className }: IconProp
       return <Svg {...props}><path d="M12 5v14M5 12h14" /></Svg>
     case 'close':
       return <Svg {...props}><path d="m6 6 12 12M18 6 6 18" /></Svg>
+    case 'expand':
+      return <Svg {...props}><path d="M9 3H3v6M3 3l7 7M15 21h6v-6M21 21l-7-7M21 9V3h-6M21 3l-7 7M3 15v6h6M3 21l7-7" /></Svg>
+    case 'compress':
+      return <Svg {...props}><path d="m9 9-6 0V3M3 3l7 7M15 15l6 0v6M21 21l-7-7M15 9l0-6h6M21 3l-7 7M9 15l0 6H3M3 21l7-7" /></Svg>
     case 'chevron-down':
       return <Svg {...props}><path d="m5 9 7 7 7-7" /></Svg>
     case 'chevron-right':
