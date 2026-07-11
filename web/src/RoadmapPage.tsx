@@ -13,6 +13,21 @@ const nodeTypeLabels: Record<NodeType, string> = {
   checkpoint: 'Проверка',
 }
 
+const nodeTypeIcons: Record<NodeType, IconName> = {
+  section: 'roadmap',
+  concept: 'book',
+  practice: 'chart',
+  project: 'briefcase',
+  checkpoint: 'compass',
+}
+
+const statusReadiness: Record<RoadmapStatus, number> = {
+  not_started: 0,
+  learning: 35,
+  practicing: 70,
+  understood: 100,
+}
+
 const directionIcons: Record<string, IconName> = {
   server: 'server',
   backend: 'server',
@@ -148,6 +163,16 @@ export function RoadmapPage() {
   const direction = directions.find((item) => item.id === directionId) ?? null
   const selectedNode = useMemo(() => findNode(nodes, selectedNodeId), [nodes, selectedNodeId])
   const progress = useMemo(() => calculateProgress(nodes), [nodes])
+  const roadmapStats = useMemo(() => {
+    const allNodes = flattenNodes(nodes)
+    const topics = allNodes.filter((node) => node.node_type !== 'section')
+    return {
+      topics: topics.length,
+      sections: allNodes.length - topics.length,
+      active: topics.filter((node) => node.status === 'learning' || node.status === 'practicing').length,
+      review: topics.filter((node) => node.needs_review).length,
+    }
+  }, [nodes])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -282,19 +307,37 @@ export function RoadmapPage() {
 
         {direction && !roadmapLoading && !roadmapError && nodes.length > 0 && (
           <div className="progress-summary">
-            <div>
-              <span>Освоено {progress.understood} из {progress.total}</span>
-              <strong>{progress.percent}%</strong>
-            </div>
-            <div
-              className="progress-track"
-              role="progressbar"
-              aria-label="Освоенные темы"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={progress.percent}
-            >
-              <span style={{ width: `${progress.percent}%` }} />
+            <div className="progress-overview">
+              <div
+                className="overview-ring"
+                style={{ background: `conic-gradient(var(--accent) ${progress.percent * 3.6}deg, var(--panel-strong) 0)` }}
+                role="img"
+                aria-label={`Освоено ${progress.percent}%`}
+              >
+                <span><strong>{progress.percent}%</strong><small>освоено</small></span>
+              </div>
+              <div className="progress-overview-copy">
+                <div className="progress-summary-line">
+                  <span>Освоено {progress.understood} из {progress.total}</span>
+                  <strong>{progress.percent}%</strong>
+                </div>
+                <div
+                  className="progress-track"
+                  role="progressbar"
+                  aria-label="Освоенные темы"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={progress.percent}
+                >
+                  <span style={{ width: `${progress.percent}%` }} />
+                </div>
+                <div className="roadmap-stats" aria-label="Статистика roadmap">
+                  <span><strong>{roadmapStats.topics}</strong> тем</span>
+                  <span><strong>{roadmapStats.sections}</strong> разделов</span>
+                  <span><strong>{roadmapStats.active}</strong> в работе</span>
+                  <span><strong>{roadmapStats.review}</strong> повторить</span>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -434,6 +477,8 @@ function NodeForm({
 }) {
   const [title, setTitle] = useState('')
   const [nodeType, setNodeType] = useState<NodeType>('concept')
+  const [description, setDescription] = useState('')
+  const [nextAction, setNextAction] = useState('')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -442,7 +487,14 @@ function NodeForm({
     setSaving(true)
     setError('')
     try {
-      onCreated(await api.createNode({ direction_id: directionId, parent_id: parentId, title: title.trim(), node_type: nodeType }))
+      onCreated(await api.createNode({
+        direction_id: directionId,
+        parent_id: parentId,
+        title: title.trim(),
+        node_type: nodeType,
+        description: description.trim(),
+        next_action: nextAction.trim(),
+      }))
     } catch (requestError) {
       setError(errorMessage(requestError))
     } finally {
@@ -469,6 +521,25 @@ function NodeForm({
           <select value={nodeType} onChange={(event) => setNodeType(event.target.value as NodeType)}>
             {Object.entries(nodeTypeLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
+        </label>
+        <label>
+          Что изучить
+          <textarea
+            rows={4}
+            maxLength={4000}
+            placeholder="Ключевые понятия, практика и ожидаемый результат"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+          />
+        </label>
+        <label>
+          Следующий шаг
+          <input
+            maxLength={1000}
+            placeholder="Например: решить 3 задачи на тему"
+            value={nextAction}
+            onChange={(event) => setNextAction(event.target.value)}
+          />
         </label>
         {error && <p className="form-error" role="alert">{error}</p>}
         <div className="form-actions">
@@ -573,12 +644,67 @@ function NodeDetails({
   )
 
   return (
-    <form className="details-form" onSubmit={submit}>
+    <form className="details-form topic-card" onSubmit={submit}>
+      <div className="topic-hero">
+        <div className={`topic-icon topic-icon-${node.node_type}`}>
+          <Icon name={nodeTypeIcons[node.node_type]} size={23} />
+        </div>
+        <div className="topic-hero-copy">
+          <span className="topic-kicker">Карточка обучения</span>
+          <div className="topic-state-row">
+            <span className={`status-badge status-${node.status}`}>{statusLabels[node.status]}</span>
+            {node.needs_review && <span className="review-badge">Повторить</span>}
+          </div>
+        </div>
+        <div
+          className="topic-ring"
+          style={{ background: `conic-gradient(var(--accent) ${statusReadiness[node.status] * 3.6}deg, var(--panel-strong) 0)` }}
+          role="img"
+          aria-label={`Готовность темы ${statusReadiness[node.status]}%`}
+        >
+          <span><strong>{statusReadiness[node.status]}%</strong><small>готово</small></span>
+        </div>
+      </div>
+
       <div className="details-heading">
         <p className="eyebrow">{nodeTypeLabels[node.node_type]}</p>
         <h2>{node.title}</h2>
-        {node.description && <p>{node.description}</p>}
       </div>
+
+      <section className="topic-study" aria-labelledby={`topic-study-${node.id}`}>
+        <div className="topic-section-heading">
+          <Icon name="book" size={15} />
+          <h3 id={`topic-study-${node.id}`}>Что изучить</h3>
+        </div>
+        <p className="topic-description">
+          {node.description || 'Добавьте описание: ключевые понятия, практику и ожидаемый результат.'}
+        </p>
+      </section>
+
+      <div className="topic-metrics" aria-label="Метрики темы">
+        <div className="topic-metric">
+          <span>Уверенность</span>
+          <strong>{node.confidence}/5</strong>
+          <span className="metric-track"><span style={{ width: `${node.confidence * 20}%` }} /></span>
+        </div>
+        <div className="topic-metric">
+          <span>{node.node_type === 'section' ? 'Подтемы' : 'Оценка'}</span>
+          <strong>{node.node_type === 'section' ? node.children?.length ?? 0 : node.estimated_hours ? `${node.estimated_hours} ч` : '—'}</strong>
+          <small>{node.node_type === 'section' ? 'внутри раздела' : 'учебного времени'}</small>
+        </div>
+        <div className="topic-metric">
+          <span>Фокус</span>
+          <strong>{node.next_action ? 'Есть' : 'Нужен'}</strong>
+          <small>{node.next_action ? 'следующий шаг' : 'добавьте действие'}</small>
+        </div>
+      </div>
+
+      {node.next_action && (
+        <div className="topic-next-action">
+          <span>Следующий практический шаг</span>
+          <strong>{node.next_action}</strong>
+        </div>
+      )}
 
       <label>
         Статус
