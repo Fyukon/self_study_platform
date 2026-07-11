@@ -103,8 +103,11 @@ make clean           удалить результаты сборки
 
 ## Импорт и резервные копии
 
-Импорт курсов из Markdown/JSON и backup/restore относятся к этапам 3 и 6 и в
-текущем срезе ещё недоступны. Планируемый backup будет содержать SQLite-файл,
+Инструкция и шаблон roadmap: [docs/ROADMAP_IMPORT.md](docs/ROADMAP_IMPORT.md) и
+[docs/roadmap-template.json](docs/roadmap-template.json). Произвольная JSON-загрузка
+через UI будет добавлена отдельным этапом после preview и полной валидации.
+
+Backup/restore пока не подключены. Планируемый backup будет содержать SQLite-файл,
 JSON-экспорт и версию схемы; локальные учебные файлы копироваться не будут.
 
 ## Известные ограничения

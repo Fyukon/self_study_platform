@@ -1,0 +1,37 @@
+{
+  "seed_key": "backend-go",
+  "title": "Backend Go",
+  "description": "Практический план обучения backend-разработке.",
+  "nodes": [
+    {
+      "seed_key": "backend-go.fundamentals",
+      "title": "Основы backend",
+      "description": "Клиент, сервер, сеть и база данных.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 1,
+      "next_action": "Разобрать путь одного HTTP-запроса",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {
+          "seed_key": "backend-go.fundamentals.http",
+          "title": "HTTP",
+          "description": "Методы, заголовки, тело и коды ответа.\n\nПрактика: отправить запрос через curl.",
+          "node_type": "concept",
+          "status": "not_started",
+          "needs_review": false,
+          "confidence": 1,
+          "position": 1,
+          "next_action": "Отправить запрос через curl и разобрать заголовки",
+          "target_date": null,
+          "estimated_hours": 2,
+          "children": []
+        }
+      ]
+    }
+  ],
+  "dependencies": []
+}
