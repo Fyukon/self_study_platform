@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learning Roadmap · карта архитектуры</title>
+  <style>
+    :root { color-scheme: light; --bg:#f4f6f9; --panel:#fff; --line:#dfe5ee; --text:#202938; --muted:#667387; --accent:#4166a8; --soft:#edf2fb; --code:#f6f8fb; }
+    * { box-sizing:border-box; }
+    body { max-width:1180px; margin:0 auto; padding:40px 24px 80px; background:var(--bg); color:var(--text); font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    h1 { margin:0 0 8px; font-size:clamp(28px,4vw,46px); letter-spacing:-.04em; }
+    h2 { margin:0 0 8px; font-size:20px; }
+    h3 { margin:20px 0 8px; font-size:16px; }
+    p { color:var(--muted); }
+    .lead { max-width:780px; margin:0 0 26px; font-size:17px; }
+    .legend { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 28px; }
+    .chip { padding:5px 10px; border:1px solid var(--line); border-radius:999px; background:var(--panel); color:var(--muted); font-size:12px; }
+    .flow { overflow:auto; margin:0 0 28px; padding:16px; border:1px solid var(--line); border-radius:14px; background:#1d2738; color:#d7e2f6; font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .map { display:grid; gap:12px; }
+    details { border:1px solid var(--line); border-radius:12px; background:var(--panel); }
+    details details { margin:10px 14px 14px; background:var(--code); }
+    summary { display:flex; align-items:center; gap:10px; min-height:48px; padding:12px 16px; cursor:pointer; font-weight:700; list-style:none; }
+    summary::-webkit-details-marker { display:none; }
+    summary::before { content:""; width:8px; height:8px; border-right:2px solid var(--accent); border-bottom:2px solid var(--accent); transform:rotate(-45deg); transition:transform .15s; }
+    details[open] > summary::before { transform:rotate(45deg); }
+    .content { padding:0 16px 16px 34px; }
+    .content p { margin:4px 0 10px; }
+    ul { margin:8px 0 0; padding-left:20px; }
+    li { margin:5px 0; }
+    code { padding:2px 5px; border-radius:5px; background:var(--code); color:#2f507e; font:12px ui-monospace,SFMono-Regular,Menlo,monospace; }
+    details details code { background:#eaf0fa; }
+    .role { color:var(--muted); font-weight:400; }
+    .files { display:grid; gap:8px; }
+    .file { padding:9px 11px; border-left:3px solid #91a9d5; background:var(--panel); }
+    .file strong { display:block; margin-bottom:2px; }
+    .footer { margin-top:30px; color:var(--muted); font-size:12px; }
+    @media (prefers-color-scheme: dark) {
+      :root { color-scheme:dark; --bg:#151a22; --panel:#1d2530; --line:#344152; --text:#edf2fa; --muted:#a4afc0; --soft:#26344b; --code:#202a38; --accent:#9bb9ef; }
+      code { color:#b9d0fa; } details details code { background:#29384d; } .file { background:#202a38; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Карта архитектуры</h1>
+  <p class="lead">Раскрывайте блоки сверху вниз: сначала роль подсистемы, затем поток данных и конкретные файлы, которые его реализуют.</p>
+
+  <div class="legend">
+    <span class="chip">Go · backend</span><span class="chip">SQLite · данные</span><span class="chip">React · frontend</span><span class="chip">Vite · сборка</span>
+  </div>
+
+  <pre class="flow">Браузер
+   │ React Router + fetch /api/v1
+   ▼
+Go net/http :8080 (только 127.0.0.1)
+   │ App routes → database/sql
+   ▼
+SQLite → миграции → seed Backend Go
+   │
+   └─ production: web/dist встраивается в тот же Go-бинарник</pre>
+
+  <main class="map">
+    <details open>
+      <summary>1. Запуск приложения <span class="role">конфигурация, сервер, graceful shutdown</span></summary>
+      <div class="content">
+        <p>Обычный запуск создаёт каталоги, открывает SQLite, применяет миграции, затем запускает seed и HTTP-сервер.</p>
+        <details>
+          <summary><code>cmd/app/main.go</code></summary>
+          <div class="content"><p>Точка входа. Флаги <code>-port</code>, <code>-migrate-only</code>, <code>-seed-only</code>; адрес по умолчанию <code>127.0.0.1:8080</code>; таймауты и остановка по SIGTERM.</p></div>
+        </details>
+        <details>
+          <summary><code>internal/config/config.go</code></summary>
+          <div class="content"><p>Читает XDG-пути и создаёт <code>config.json</code>. Дефолты: Europe/Moscow, SQLite в <code>~/.local/share/learning-roadmap</code>.</p></div>
+        </details>
+        <details>
+          <summary><code>web/web_prod.go</code> · <code>web/web_dev.go</code></summary>
+          <div class="content"><p>В production отдаёт Vite-файлы и fallback на <code>index.html</code>; в development направляет к Vite-серверу.</p></div>
+        </details>
+      </div>
+    </details>
+
+    <details>
+      <summary>2. Данные и схема <span class="role">SQLite, UTC, индексы</span></summary>
+      <div class="content">
+        <p>Backend использует <code>database/sql</code> и один SQLite connection для локального single-user режима.</p>
+        <details>
+          <summary><code>internal/database/database.go</code></summary>
+          <div class="content"><p>Открывает SQLite, включает foreign keys/WAL, применяет embedded SQL и импортирует seed транзакционно.</p></div>
+        </details>
+        <details>
+          <summary><code>migrations/0001_initial.sql</code></summary>
+          <div class="content"><p>Таблицы settings, directions, roadmap_nodes, node_dependencies; CHECK-ограничения статусов/confidence и индексы дерева.</p></div>
+        </details>
+        <details>
+          <summary><code>migrations/embed.go</code></summary>
+          <div class="content"><p>Встраивает миграции в бинарник, поэтому отдельная директория миграций в production не нужна.</p></div>
+        </details>
+      </div>
+    </details>
+
+    <details>
+      <summary>3. Seed Backend Go <span class="role">первый запуск, идемпотентность</span></summary>
+      <div class="content">
+        <p>Seed создаёт направление с 10 разделами, 86 узлами и 16 зависимостями. При наличии стабильного <code>seed_key</code> повторный запуск ничего не восстанавливает поверх пользовательских изменений.</p>
+        <details>
+          <summary><code>seeds/backend_go_roadmap.json</code></summary>
+          <div class="content"><p>Содержит дерево, статусы, confidence, next_action и зависимости между узлами.</p></div>
+        </details>
+        <details>
+          <summary><code>seeds/embed.go</code></summary>
+          <div class="content"><p>Делает JSON доступным через <code>embed.FS</code>.</p></div>
+        </details>
+      </div>
+    </details>
+
+    <details open>
+      <summary>4. HTTP API <span class="role">единая точка входа для UI</span></summary>
+      <div class="content">
+        <p>Все endpoints начинаются с <code>/api/v1</code>. Ошибки возвращаются как <code>error.code/message/details</code>; запросы логируются request_id, method, path, status и duration_ms.</p>
+        <details>
+          <summary><code>internal/app/app.go</code></summary>
+          <div class="content"><p>Маршруты, JSON-декодирование с body limit, recovery, request logging, health/version/settings.</p></div>
+        </details>
+        <details>
+          <summary><code>internal/app/model.go</code></summary>
+          <div class="content"><p>Go-модели Settings, Direction, RoadmapNode и NodeDependency; общая валидация статусов и confidence.</p></div>
+        </details>
+        <details>
+          <summary><code>internal/app/settings_directions.go</code></summary>
+          <div class="content"><p>CRUD directions и settings. Удаление направления — архивирование, не физическое удаление.</p></div>
+        </details>
+        <details>
+          <summary><code>internal/app/roadmap.go</code></summary>
+          <div class="content"><p>Рекурсивное дерево, CRUD узлов, move с проверкой циклов, зависимости и защита направления родителя.</p></div>
+        </details>
+      </div>
+    </details>
+
+    <details>
+      <summary>5. Frontend <span class="role">экраны, состояние, API-клиент</span></summary>
+      <div class="content">
+        <p>React Router хранит выбранное направление в URL: <code>/roadmap/1</code> или <code>/roadmap?direction=1</code>. Поэтому прямые ссылки и обновление страницы не теряют контекст.</p>
+        <details>
+          <summary><code>web/src/main.tsx</code> · <code>web/src/App.tsx</code></summary>
+          <div class="content"><p>Bootstrap React, BrowserRouter, навигация, темы и маршруты Dashboard/Roadmap.</p></div>
+        </details>
+        <details>
+          <summary><code>web/src/RoadmapPage.tsx</code></summary>
+          <div class="content"><p>Загрузка directions/roadmap, выбор направления, создание узлов, редактирование прогресса, управление зависимостями и hotkeys <code>Esc/N/R</code>.</p></div>
+        </details>
+        <details>
+          <summary><code>web/src/RoadmapTree.tsx</code></summary>
+          <div class="content"><p>Рекурсивное дерево с раскрытием веток и текстовыми статусами.</p></div>
+        </details>
+        <details>
+          <summary><code>web/src/api.ts</code> · <code>web/src/types.ts</code></summary>
+          <div class="content"><p>Минимальный fetch-клиент и типы API в snake_case.</p></div>
+        </details>
+        <details>
+          <summary><code>web/src/icons.tsx</code> · <code>web/src/styles.css</code></summary>
+          <div class="content"><p>Локальные inline SVG-иконки без UI-библиотеки и общая светлая/тёмная тема.</p></div>
+        </details>
+        <details>
+          <summary><code>web/public/architecture.html</code></summary>
+          <div class="content"><p>Эта карта: native HTML <code>details/summary</code> раскрывает уровень ответственности до конкретных файлов.</p></div>
+        </details>
+      </div>
+    </details>
+
+    <details>
+      <summary>6. Проверки и сборка <span class="role">что запускать перед изменениями</span></summary>
+      <div class="content">
+        <div class="files">
+          <div class="file"><strong><code>internal/app/http_test.go</code></strong>CRUD directions/nodes, статусы, move, cycles, dependencies, error format.</div>
+          <div class="file"><strong><code>internal/database/database_test.go</code></strong>Миграции и seed без дублей/восстановления удалённых тем.</div>
+          <div class="file"><strong><code>web/src/RoadmapTree.test.tsx</code></strong>Рендер вложенного дерева и расчёт прогресса.</div>
+          <div class="file"><strong><code>Makefile</code></strong><code>make dev</code>, <code>make test</code>, <code>make lint</code>, <code>make build</code>, <code>make migrate</code>, <code>make seed</code>.</div>
+          <div class="file"><strong><code>README.md</code></strong>Запуск, пути данных, архитектура и ограничения этапов 1–2.</div>
+        </div>
+      </div>
+    </details>
+  </main>
+
+  <p class="footer">Карта соответствует текущему срезу проекта. Следующие крупные модули по ТЗ: курсы, материалы, сессии/проекты, аналитика и backup.</p>
+</body>
+</html>
