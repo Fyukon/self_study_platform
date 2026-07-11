@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { api } from './api'
-import { calculateProgress, RoadmapTree, statusLabels } from './RoadmapTree'
+import { calculateProgress, flattenNodes, RoadmapTree, statusLabels } from './RoadmapTree'
 import type { Direction, NodeType, RoadmapNode, RoadmapStatus } from './types'
 import { Icon, type IconName } from './icons'
 import { useParams, useSearchParams } from 'react-router-dom'
@@ -69,10 +69,6 @@ function removeNode(nodes: RoadmapNode[], id: number): RoadmapNode[] {
   ))
 }
 
-function flattenNodes(nodes: RoadmapNode[]): RoadmapNode[] {
-  return nodes.flatMap((node) => [node, ...flattenNodes(node.children ?? [])])
-}
-
 function directionSlug(title: string): string {
   return title.trim().toLocaleLowerCase('ru-RU').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')
 }
@@ -99,6 +95,7 @@ export function RoadmapPage() {
   const { directionId: pathDirection } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedDirection = searchParams.get('direction') ?? pathDirection ?? null
+  const requestedNode = searchParams.get('node')
   const [directions, setDirections] = useState<Direction[]>([])
   const [directionId, setDirectionId] = useState<number | null>(null)
   const [nodes, setNodes] = useState<RoadmapNode[]>([])
@@ -158,6 +155,12 @@ export function RoadmapPage() {
       })
     return () => controller.abort()
   }, [directionId, roadmapReload])
+
+  useEffect(() => {
+    const nodeId = Number(requestedNode)
+    if (!Number.isSafeInteger(nodeId) || nodeId <= 0 || directionId === null || nodes.length === 0) return
+    if (findNode(nodes, nodeId)?.direction_id === directionId) setSelectedNodeId(nodeId)
+  }, [directionId, nodes, requestedNode])
 
   const activeDirections = directions.filter((direction) => !direction.is_archived)
   const archivedDirections = directions.filter((direction) => direction.is_archived)

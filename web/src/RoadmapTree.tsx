@@ -33,6 +33,10 @@ export function calculateProgress(nodes: RoadmapNode[]): Progress {
   return { total, understood, percent: total ? Math.round((understood / total) * 100) : 0 }
 }
 
+export function flattenNodes(nodes: RoadmapNode[]): RoadmapNode[] {
+  return nodes.flatMap((node) => [node, ...flattenNodes(node.children ?? [])])
+}
+
 interface RoadmapTreeProps {
   nodes: RoadmapNode[]
   selectedId: number | null

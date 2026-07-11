@@ -144,12 +144,16 @@ SQLite → миграции → seed Backend Go
           <div class="content"><p>Bootstrap React, BrowserRouter, навигация, темы и маршруты Dashboard/Roadmap.</p></div>
         </details>
         <details>
+          <summary><code>web/src/Dashboard.tsx</code></summary>
+          <div class="content"><p>Экран «Сегодня»: загружает активные roadmap, вычисляет повторение, просрочки, доступные действия, блокировки зависимостями и недельную активность.</p></div>
+        </details>
+        <details>
           <summary><code>web/src/RoadmapPage.tsx</code></summary>
-          <div class="content"><p>Загрузка directions/roadmap, выбор направления, создание узлов, анимированная карточка каждой темы с описанием, готовностью и следующим шагом, полноэкранный режим карточки с закрытием по <code>Esc</code>, редактирование прогресса, управление зависимостями и hotkeys <code>Esc/N/R</code>.</p></div>
+          <div class="content"><p>Загрузка directions/roadmap, выбор направления и темы из URL (<code>node</code>), создание узлов, анимированная карточка каждой темы с описанием, готовностью и следующим шагом, полноэкранный режим карточки с закрытием по <code>Esc</code>, редактирование прогресса, управление зависимостями и hotkeys <code>Esc/N/R</code>.</p></div>
         </details>
         <details>
           <summary><code>web/src/RoadmapTree.tsx</code></summary>
-          <div class="content"><p>Рекурсивное дерево с раскрытием веток и текстовыми статусами.</p></div>
+          <div class="content"><p>Рекурсивное дерево с раскрытием веток и текстовыми статусами; общий helper <code>flattenNodes</code> используется Dashboard и RoadmapPage.</p></div>
         </details>
         <details>
           <summary><code>web/src/api.ts</code> · <code>web/src/types.ts</code></summary>
@@ -173,6 +177,7 @@ SQLite → миграции → seed Backend Go
           <div class="file"><strong><code>internal/app/http_test.go</code></strong>CRUD directions/nodes, статусы, move, cycles, dependencies, error format.</div>
           <div class="file"><strong><code>internal/database/database_test.go</code></strong>Миграции и seed без дублей/восстановления удалённых тем.</div>
           <div class="file"><strong><code>web/src/RoadmapTree.test.tsx</code></strong>Рендер вложенного дерева и расчёт прогресса.</div>
+          <div class="file"><strong><code>web/src/Dashboard.test.ts</code></strong>Классификация сегодняшних действий, просрочек, повторений, зависимостей и недельной активности.</div>
           <div class="file"><strong><code>Makefile</code></strong><code>make dev</code>, <code>make test</code>, <code>make lint</code>, <code>make build</code>, <code>make migrate</code>, <code>make seed</code>.</div>
           <div class="file"><strong><code>README.md</code></strong>Запуск, пути данных, архитектура и ограничения этапов 1–2.</div>
         </div>
