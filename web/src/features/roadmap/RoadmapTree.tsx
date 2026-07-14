@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import type { RoadmapNode, RoadmapStatus } from './types'
-import { Icon } from './icons'
+import type { RoadmapNode, RoadmapStatus } from '../../shared/types'
+import { Icon } from '../../shared/components/Icon'
 
 export const statusLabels: Record<RoadmapStatus, string> = {
   not_started: 'Не начато',

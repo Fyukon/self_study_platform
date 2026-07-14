@@ -1,4 +1,4 @@
-package app
+package roadmap
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func (a *App) nodeByID(ctx context.Context, id int64) (RoadmapNode, error) {
+func (a *Handler) nodeByID(ctx context.Context, id int64) (RoadmapNode, error) {
 	node, err := scanNode(a.db.QueryRowContext(ctx, `SELECT `+nodeColumns+` FROM roadmap_nodes WHERE id = ?`, id))
 	if err != nil {
 		return RoadmapNode{}, err
@@ -23,7 +23,7 @@ func (a *App) nodeByID(ctx context.Context, id int64) (RoadmapNode, error) {
 	return node, nil
 }
 
-func (a *App) dependencies(ctx context.Context, nodeID int64) ([]NodeDependency, error) {
+func (a *Handler) dependencies(ctx context.Context, nodeID int64) ([]NodeDependency, error) {
 	rows, err := a.db.QueryContext(ctx, `SELECT id, node_id, depends_on_node_id, created_at
 		FROM node_dependencies WHERE node_id = ? ORDER BY id`, nodeID)
 	if err != nil {
@@ -41,7 +41,7 @@ func (a *App) dependencies(ctx context.Context, nodeID int64) ([]NodeDependency,
 	return dependencies, rows.Err()
 }
 
-func (a *App) roadmapTree(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) roadmapTree(w http.ResponseWriter, r *http.Request) {
 	directionID, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_DIRECTION_ID", "Direction id is invalid", "roadmap_tree", 0, err)
@@ -130,7 +130,7 @@ type nodeCreate struct {
 	EstimatedHours float64 `json:"estimated_hours"`
 }
 
-func (a *App) createNode(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) createNode(w http.ResponseWriter, r *http.Request) {
 	var input nodeCreate
 	if !a.decodeOrProblem(w, r, &input, "create_node") {
 		return
@@ -229,7 +229,7 @@ func normalizeDates(targetDate, lastReviewedAt **string) error {
 	return nil
 }
 
-func (a *App) getNodeHandler(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) getNodeHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_ROADMAP_NODE_ID", "Roadmap node id is invalid", "get_node", 0, err)
@@ -280,7 +280,7 @@ type nodeUpdate struct {
 	EstimatedHours *float64       `json:"estimated_hours"`
 }
 
-func (a *App) updateNode(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) updateNode(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_ROADMAP_NODE_ID", "Roadmap node id is invalid", "update_node", 0, err)
@@ -358,7 +358,7 @@ func (a *App) updateNode(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, node)
 }
 
-func (a *App) deleteNode(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) deleteNode(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_ROADMAP_NODE_ID", "Roadmap node id is invalid", "delete_node", 0, err)
@@ -401,7 +401,7 @@ type nodeMove struct {
 	Position *int          `json:"position"`
 }
 
-func (a *App) moveNode(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) moveNode(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_ROADMAP_NODE_ID", "Roadmap node id is invalid", "move_node", 0, err)
@@ -483,7 +483,7 @@ type dependencyCreate struct {
 	DependsOnNodeID int64 `json:"depends_on_node_id"`
 }
 
-func (a *App) createDependency(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) createDependency(w http.ResponseWriter, r *http.Request) {
 	nodeID, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_ROADMAP_NODE_ID", "Roadmap node id is invalid", "create_dependency", 0, err)
@@ -533,7 +533,7 @@ func (a *App) createDependency(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, dependency)
 }
 
-func (a *App) deleteDependency(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) deleteDependency(w http.ResponseWriter, r *http.Request) {
 	nodeID, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_ROADMAP_NODE_ID", "Roadmap node id is invalid", "delete_dependency", 0, err)

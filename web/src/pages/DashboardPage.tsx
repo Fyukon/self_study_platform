@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from './api'
-import { flattenNodes, statusLabels } from './RoadmapTree'
-import { Icon, type IconName } from './icons'
-import type { Direction, RoadmapNode } from './types'
+import { roadmapApi } from '../features/roadmap/api'
+import { flattenNodes, statusLabels } from '../features/roadmap/RoadmapTree'
+import { Icon, type IconName } from '../shared/components/Icon'
+import type { Direction, RoadmapNode } from '../shared/types'
 
 export interface RoadmapSnapshot {
   direction: Direction
@@ -138,7 +138,7 @@ function topicHref(item: TodayItem): string {
   return `/roadmap/${item.direction.id}?node=${item.node.id}`
 }
 
-export function Dashboard() {
+export function DashboardPage() {
   const [snapshots, setSnapshots] = useState<RoadmapSnapshot[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -149,11 +149,11 @@ export function Dashboard() {
     const controller = new AbortController()
     setLoading(true)
     setError('')
-    api.directions(controller.signal)
+    roadmapApi.directions(controller.signal)
       .then((directions) => Promise.all(
         directions
           .filter((direction) => !direction.is_archived)
-          .map(async (direction) => ({ direction, nodes: await api.roadmap(direction.id, controller.signal) })),
+          .map(async (direction) => ({ direction, nodes: await roadmapApi.roadmap(direction.id, controller.signal) })),
       ))
       .then(setSnapshots)
       .catch((requestError) => {

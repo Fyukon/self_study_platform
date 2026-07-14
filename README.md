@@ -76,16 +76,25 @@ SQLite-базой. SQL применяется через `database/sql`, схе�
 миграциями, а production frontend встраивается в Go-бинарник через `go:embed`.
 
 ```text
-cmd/app/            точка входа
-internal/config/    локальная конфигурация
-internal/database/  открытие SQLite и миграции
-internal/app/       Directions, Roadmap, Courses и HTTP API
-migrations/         SQL-миграции
-seeds/              идемпотентный Backend Go seed
-web/                React, TypeScript и Vite
-web/public/         статические материалы, включая карту архитектуры
-dist/               production-бинарник
+cmd/app/                 точка входа и запуск HTTP-сервера
+internal/config/         локальная конфигурация
+internal/database/       открытие SQLite и миграции
+internal/app/             composition root, health/version и сборка маршрутов
+internal/shared/httpx/   общий HTTP-транспорт, ошибки и middleware
+internal/modules/        доменные модули settings, roadmap и courses
+migrations/              SQL-миграции
+seeds/                   идемпотентный Backend Go seed
+web/src/app/             bootstrap React, router и глобальные стили
+web/src/pages/           страницы маршрутов
+web/src/features/        UI и API-контракты доменных областей
+web/src/shared/          общий API-клиент, типы и компоненты
+web/public/              статические материалы, включая карту архитектуры
+dist/                    production-бинарник
 ```
+
+Backend остаётся единым процессом и общей SQLite-базой, но HTTP-композиция и доменная
+логика разделены по модулям. Frontend использует такую же границу: приложение и страницы
+собирают feature-модули, а транспорт, типы и переиспользуемые компоненты живут в `shared`.
 
 API использует префикс `/api/v1`; ошибки имеют единый вид
 `{"error":{"code":"...","message":"...","details":{}}}`.

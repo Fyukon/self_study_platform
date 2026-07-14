@@ -1,7 +1,8 @@
 import { FormEvent, useEffect, useState } from 'react'
-import { api } from './api'
-import { flattenNodes } from './RoadmapTree'
-import { Icon } from './icons'
+import { coursesApi } from '../features/courses/api'
+import { roadmapApi } from '../features/roadmap/api'
+import { flattenNodes } from '../features/roadmap/RoadmapTree'
+import { Icon } from '../shared/components/Icon'
 import type {
   Course,
   CourseImportPreview,
@@ -13,7 +14,7 @@ import type {
   Direction,
   ResourceType,
   RoadmapNode,
-} from './types'
+} from '../shared/types'
 
 const resourceTypeLabels: Record<ResourceType, string> = {
   book: 'Книга',
@@ -90,8 +91,8 @@ export function CoursesPage() {
 
   const refresh = async (id = selectedId) => {
     const [courseItems, course] = await Promise.all([
-      api.courses(),
-      id === null ? Promise.resolve(null) : api.course(id),
+      coursesApi.courses(),
+      id === null ? Promise.resolve(null) : coursesApi.course(id),
     ])
     setCourses(courseItems)
     if (course) setSelectedCourse(course)
@@ -102,7 +103,7 @@ export function CoursesPage() {
     const controller = new AbortController()
     setLoading(true)
     setError('')
-    api.courses(controller.signal)
+    coursesApi.courses(controller.signal)
       .then((items) => {
         setCourses(items)
         setSelectedId((current) => current ?? items.find((course) => !course.is_archived)?.id ?? items[0]?.id ?? null)
@@ -124,7 +125,7 @@ export function CoursesPage() {
     const controller = new AbortController()
     setDetailLoading(true)
     setActionError('')
-    api.course(selectedId, controller.signal)
+    coursesApi.course(selectedId, controller.signal)
       .then(setSelectedCourse)
       .catch((requestError) => {
         if (!(requestError instanceof DOMException && requestError.name === 'AbortError')) setActionError(errorMessage(requestError))
@@ -137,11 +138,11 @@ export function CoursesPage() {
 
   useEffect(() => {
     const controller = new AbortController()
-    api.directions(controller.signal)
+    roadmapApi.directions(controller.signal)
       .then((directions) => Promise.all(
         directions
           .filter((direction) => !direction.is_archived)
-          .map(async (direction) => ({ direction, nodes: await api.roadmap(direction.id, controller.signal) })),
+          .map(async (direction) => ({ direction, nodes: await roadmapApi.roadmap(direction.id, controller.signal) })),
       ))
       .then((snapshots) => setRoadmapOptions(snapshots.flatMap(({ direction, nodes }) =>
         flattenNodes(nodes)
@@ -157,7 +158,7 @@ export function CoursesPage() {
   const createCourse = async (data: { title: string; description: string; provider: string; source_url: string }) => {
     setActionError('')
     try {
-      const created = await api.createCourse(data)
+      const created = await coursesApi.createCourse(data)
       setCourses((items) => [...items, {
         ...created,
         module_count: 0,
@@ -173,8 +174,8 @@ export function CoursesPage() {
   const importCourse = async (preview: CourseImportPreview) => {
     setActionError('')
     try {
-      const imported = await api.importCourse(preview.preview_id)
-      const items = await api.courses()
+      const imported = await coursesApi.importCourse(preview.preview_id)
+      const items = await coursesApi.courses()
       setCourses(items)
       setSelectedId(imported.id)
       setShowImport(false)
@@ -309,7 +310,7 @@ function CourseDetail({
     setSaving(true)
     onError('')
     try {
-      const updated = await api.updateCourse(course.id, { title, description, provider, source_url: sourceUrl })
+      const updated = await coursesApi.updateCourse(course.id, { title, description, provider, source_url: sourceUrl })
       onCourseUpdated(updated)
       setEditing(false)
     } catch (requestError) {
@@ -321,7 +322,7 @@ function CourseDetail({
 
   const archive = async () => {
     try {
-      await api.archiveCourse(course.id)
+      await coursesApi.archiveCourse(course.id)
       const refreshed = await onRefresh()
       if (!refreshed) return
     } catch (requestError) {
@@ -346,7 +347,7 @@ function CourseDetail({
             {course.description && <p>{course.description}</p>}
             {course.source_url && <a className="course-source-link" href={course.source_url} target="_blank" rel="noreferrer"><Icon name="arrow-up-right" size={14} /> Открыть страницу курса</a>}
             {course.is_archived && <button className="button secondary small" type="button" onClick={async () => {
-              try { const restored = await api.updateCourse(course.id, { is_archived: false }); onCourseUpdated(restored) } catch (requestError) { onError(errorMessage(requestError)) }
+              try { const restored = await coursesApi.updateCourse(course.id, { is_archived: false }); onCourseUpdated(restored) } catch (requestError) { onError(errorMessage(requestError)) }
             }}>Вернуть из архива</button>}
           </div>
         )}
@@ -366,7 +367,7 @@ function ModuleCreateForm({ courseId, onCancel, onDone, onError }: { courseId: n
   const submit = async (event: FormEvent) => {
     event.preventDefault()
     setSaving(true)
-    try { await api.createCourseModule(courseId, { title, description }); await onDone() } catch (requestError) { onError(errorMessage(requestError)) } finally { setSaving(false) }
+    try { await coursesApi.createCourseModule(courseId, { title, description }); await onDone() } catch (requestError) { onError(errorMessage(requestError)) } finally { setSaving(false) }
   }
   return <form className="module-create-form" onSubmit={submit}><label>Название модуля<input required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Например, HTTP и сети" /></label><label>Описание<textarea rows={2} value={description} onChange={(event) => setDescription(event.target.value)} /></label><div className="form-actions"><button className="button secondary small" type="button" onClick={onCancel}>Отмена</button><button className="button primary small" type="submit" disabled={saving}>{saving ? 'Добавляем…' : 'Добавить'}</button></div></form>
 }
@@ -387,11 +388,11 @@ function ModuleCard({ module, roadmapOptions, disabled, onRefresh, onError }: { 
 
   const save = async (event: FormEvent) => {
     event.preventDefault()
-    try { await api.updateCourseModule(module.id, { title, description, status }); setEditing(false); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) }
+    try { await coursesApi.updateCourseModule(module.id, { title, description, status }); setEditing(false); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) }
   }
 
   const remove = async () => {
-    try { await api.deleteCourseModule(module.id); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) }
+    try { await coursesApi.deleteCourseModule(module.id); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) }
   }
 
   return (
@@ -408,7 +409,7 @@ function ModuleCard({ module, roadmapOptions, disabled, onRefresh, onError }: { 
         {module.resources.length === 0 && !showResourceForm && <p className="module-empty">Добавьте книгу, видео, репозиторий, ссылку или локальный файл.</p>}
         <div className="module-subheading module-links-heading"><span>Связь с roadmap <strong>{module.roadmap_links.length}</strong></span><button className="text-button" type="button" disabled={disabled || roadmapOptions.length === 0} onClick={() => setShowLinkForm((value) => !value)}><Icon name="roadmap" size={14} /> Связать тему</button></div>
         {showLinkForm && <RoadmapLinkForm module={module} options={roadmapOptions} onCancel={() => setShowLinkForm(false)} onDone={async () => { setShowLinkForm(false); await onRefresh() }} onError={onError} />}
-        {module.roadmap_links.length > 0 && <div className="roadmap-link-list">{module.roadmap_links.map((link) => <div className="roadmap-link" key={link.id}><Icon name="roadmap" size={14} /><span><strong>{link.node_title}</strong><small>{link.direction_title}</small></span><button className="text-button" type="button" disabled={disabled} aria-label={`Удалить связь с ${link.node_title}`} onClick={async () => { try { await api.deleteRoadmapLink(module.id, link.id); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) } }}>Убрать</button></div>)}</div>}
+        {module.roadmap_links.length > 0 && <div className="roadmap-link-list">{module.roadmap_links.map((link) => <div className="roadmap-link" key={link.id}><Icon name="roadmap" size={14} /><span><strong>{link.node_title}</strong><small>{link.direction_title}</small></span><button className="text-button" type="button" disabled={disabled} aria-label={`Удалить связь с ${link.node_title}`} onClick={async () => { try { await coursesApi.deleteRoadmapLink(module.id, link.id); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) } }}>Убрать</button></div>)}</div>}
         {module.roadmap_links.length === 0 && !showLinkForm && <p className="module-empty">Свяжите модуль с темой, чтобы видеть его в контексте roadmap.</p>}
       </div>
     </section>
@@ -426,7 +427,7 @@ function ResourceForm({ moduleId, onCancel, onDone, onError }: { moduleId: numbe
     event.preventDefault()
     setSaving(true)
     const data: CreateResource = { title, resource_type: resourceType, note, ...(local ? { local_path: location } : { url: location }) }
-    try { await api.createResource(moduleId, data); await onDone() } catch (requestError) { onError(errorMessage(requestError)) } finally { setSaving(false) }
+    try { await coursesApi.createResource(moduleId, data); await onDone() } catch (requestError) { onError(errorMessage(requestError)) } finally { setSaving(false) }
   }
   return <form className="resource-form" onSubmit={submit}><div className="resource-form-grid"><label>Название<input required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Например, Go by Example" /></label><label>Тип<select value={resourceType} onChange={(event) => { const value = event.target.value as ResourceType; setResourceType(value); setLocation('') }}>{resourceTypes.map((value) => <option key={value} value={value}>{resourceTypeLabels[value]}</option>)}</select></label></div><label>{local ? 'Путь к файлу' : 'URL'}<input required type={local ? 'text' : 'url'} value={location} onChange={(event) => setLocation(event.target.value)} placeholder={local ? '/home/user/notes.md' : 'https://...'} /></label><label>Заметка<textarea rows={2} value={note} onChange={(event) => setNote(event.target.value)} placeholder="Что прочитать или попробовать" /></label><div className="form-actions"><button className="button secondary small" type="button" onClick={onCancel}>Отмена</button><button className="button primary small" type="submit" disabled={saving}>{saving ? 'Добавляем…' : 'Добавить материал'}</button></div></form>
 }
@@ -440,10 +441,10 @@ function ResourceRow({ resource, disabled, onRefresh, onError }: { resource: Cou
   const local = resourceType === 'local_file'
   const save = async (event: FormEvent) => {
     event.preventDefault()
-    try { await api.updateResource(resource.id, { title, resource_type: resourceType, note, url: local ? '' : location, local_path: local ? location : '' }); setEditing(false); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) }
+    try { await coursesApi.updateResource(resource.id, { title, resource_type: resourceType, note, url: local ? '' : location, local_path: local ? location : '' }); setEditing(false); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) }
   }
   const remove = async () => {
-    try { await api.deleteResource(resource.id); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) }
+    try { await coursesApi.deleteResource(resource.id); await onRefresh() } catch (requestError) { onError(errorMessage(requestError)) }
   }
   if (editing) return <form className="resource-row resource-row-edit" onSubmit={save}><div className="resource-form-grid"><label>Название<input required value={title} onChange={(event) => setTitle(event.target.value)} /></label><label>Тип<select value={resourceType} onChange={(event) => { const value = event.target.value as ResourceType; setResourceType(value); setLocation('') }}>{resourceTypes.map((value) => <option key={value} value={value}>{resourceTypeLabels[value]}</option>)}</select></label></div><label>{local ? 'Путь к файлу' : 'URL'}<input required type={local ? 'text' : 'url'} value={location} onChange={(event) => setLocation(event.target.value)} /></label><label>Заметка<textarea rows={2} value={note} onChange={(event) => setNote(event.target.value)} /></label><div className="form-actions"><button className="button secondary small" type="button" onClick={() => setEditing(false)}>Отмена</button><button className="button primary small" type="submit">Сохранить</button></div></form>
   return <div className="resource-row"><span className={`resource-type resource-type-${resource.resource_type}`}><Icon name={resource.resource_type === 'local_file' ? 'journal' : resource.resource_type === 'repository' ? 'briefcase' : resource.resource_type === 'video' ? 'chart' : 'book'} size={14} /></span><span className="resource-copy"><a href={courseResourceHref(resource)} target={resource.resource_type === 'local_file' ? undefined : '_blank'} rel={resource.resource_type === 'local_file' ? undefined : 'noreferrer'}>{resource.title}</a><small>{resource.resource_type === 'local_file' ? resource.local_path : resource.url}{resource.note ? ` · ${resource.note}` : ''}</small></span><button className="text-button" type="button" disabled={disabled} onClick={() => setEditing(true)}>Изменить</button><button className="danger-button" type="button" disabled={disabled} onClick={remove}>Удалить</button></div>
@@ -456,7 +457,7 @@ function RoadmapLinkForm({ module, options, onCancel, onDone, onError }: { modul
   const submit = async (event: FormEvent) => {
     event.preventDefault()
     if (!nodeId) return
-    try { await api.createRoadmapLink(module.id, Number(nodeId)); await onDone() } catch (requestError) { onError(errorMessage(requestError)) }
+    try { await coursesApi.createRoadmapLink(module.id, Number(nodeId)); await onDone() } catch (requestError) { onError(errorMessage(requestError)) }
   }
   return <form className="roadmap-link-form" onSubmit={submit}><label>Тема roadmap<select required value={nodeId} onChange={(event) => setNodeId(event.target.value)}><option value="" disabled>Выберите тему</option>{available.map(({ direction, node }) => <option key={node.id} value={node.id}>{direction.title} · {node.title}</option>)}</select></label><div className="form-actions"><button className="button secondary small" type="button" onClick={onCancel}>Отмена</button><button className="button primary small" type="submit" disabled={!nodeId}>Связать</button></div></form>
 }
@@ -472,7 +473,7 @@ function CourseImportPanel({ onClose, onImported }: { onClose: () => void; onImp
     event.preventDefault()
     setLoading(true)
     setError('')
-    try { setPreview(await api.previewCourseImport(format, content)) } catch (requestError) { setError(errorMessage(requestError)); setPreview(null) } finally { setLoading(false) }
+    try { setPreview(await coursesApi.previewCourseImport(format, content)) } catch (requestError) { setError(errorMessage(requestError)); setPreview(null) } finally { setLoading(false) }
   }
   return <section className="course-import-panel" aria-labelledby="course-import-title"><div className="course-import-heading"><div><p className="eyebrow">Безопасный импорт</p><h2 id="course-import-title">Сначала preview, потом запись</h2><p>Текст проверяется и показывается до создания курса. Preview действует 15 минут и используется один раз.</p></div><button className="icon-button" type="button" aria-label="Закрыть импорт" onClick={onClose}><Icon name="close" size={16} /></button></div><form onSubmit={previewImport}><div className="import-toolbar"><label>Формат<select value={format} onChange={(event) => { const next = event.target.value as 'markdown' | 'json'; setFormat(next); setContent(next === 'markdown' ? markdownExample : jsonExample); setPreview(null) }}><option value="markdown">Markdown</option><option value="json">JSON</option></select></label><button className="text-button" type="button" onClick={() => setContent(example)}>Подставить пример</button></div><label>Содержимое<textarea className="import-textarea" rows={13} value={content} onChange={(event) => { setContent(event.target.value); setPreview(null) }} /></label>{error && <p className="form-error">{error}</p>}<div className="form-actions"><button className="button primary" type="submit" disabled={loading}>{loading ? 'Проверяем…' : 'Показать preview'}</button></div></form>{preview && <ImportPreview preview={preview} onImported={onImported} />}</section>
 }

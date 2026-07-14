@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom'
-import { CoursesPage } from './CoursesPage'
-import { Dashboard } from './Dashboard'
-import { RoadmapPage } from './RoadmapPage'
-import { Icon } from './icons'
+import { CoursesPage } from '../pages/CoursesPage'
+import { DashboardPage } from '../pages/DashboardPage'
+import { RoadmapPage } from '../pages/RoadmapPage'
+import { Icon } from '../shared/components/Icon'
 
 type Theme = 'light' | 'dark'
 
@@ -70,7 +70,7 @@ export function App() {
 
       <main className="app-content">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<DashboardPage />} />
           <Route path="/roadmap" element={<RoadmapPage />} />
           <Route path="/roadmap/:directionId" element={<RoadmapPage />} />
           <Route path="/courses" element={<CoursesPage />} />

@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { directionIDFromReference } from './RoadmapPage'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
-import { Icon } from './icons'
-import type { Direction } from './types'
+import { Icon } from '../shared/components/Icon'
+import type { Direction } from '../shared/types'
 
 const directions: Direction[] = [{
   id: 7,
