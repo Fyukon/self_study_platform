@@ -91,6 +91,10 @@ SQLite → миграции → seed Backend Go
           <div class="content"><p>Таблицы settings, directions, roadmap_nodes, node_dependencies; CHECK-ограничения статусов/confidence и индексы дерева.</p></div>
         </details>
         <details>
+          <summary><code>migrations/0002_courses.sql</code></summary>
+          <div class="content"><p>Таблицы courses, course_modules, resources и course_module_roadmap_links. Foreign keys с каскадным удалением дочерних записей, уникальность связи модуль–тема и CHECK-правило для URL/локального пути.</p></div>
+        </details>
+        <details>
           <summary><code>migrations/embed.go</code></summary>
           <div class="content"><p>Встраивает миграции в бинарник, поэтому отдельная директория миграций в production не нужна.</p></div>
         </details>
@@ -136,6 +140,10 @@ SQLite → миграции → seed Backend Go
           <summary><code>internal/app/roadmap.go</code></summary>
           <div class="content"><p>Рекурсивное дерево, CRUD узлов, move с проверкой циклов, зависимости и защита направления родителя.</p></div>
         </details>
+        <details>
+          <summary><code>internal/app/courses.go</code></summary>
+          <div class="content"><p>CRUD курсов, модулей и ресурсов; связи модулей с roadmap; строгая валидация URL/локальных файлов; парсинг Markdown/JSON; одноразовый preview с TTL и транзакционный импорт.</p></div>
+        </details>
       </div>
     </details>
 
@@ -156,12 +164,16 @@ SQLite → миграции → seed Backend Go
           <div class="content"><p>Загрузка directions/roadmap, выбор направления и темы из URL (<code>node</code>), создание узлов, анимированная карточка каждой темы с описанием, готовностью и следующим шагом, полноэкранный режим карточки с закрытием по <code>Esc</code>, редактирование прогресса, управление зависимостями и hotkeys <code>Esc/N/R</code>.</p></div>
         </details>
         <details>
+          <summary><code>web/src/CoursesPage.tsx</code></summary>
+          <div class="content"><p>Библиотека курсов с ручным созданием, редактированием и архивированием; управление модулями и материалами; ссылки на HTTP-ресурсы и локальные файлы; выбор тем roadmap; import-панель, которая показывает preview до записи.</p></div>
+        </details>
+        <details>
           <summary><code>web/src/RoadmapTree.tsx</code></summary>
           <div class="content"><p>Рекурсивное дерево с раскрытием веток и текстовыми статусами; общий helper <code>flattenNodes</code> используется Dashboard и RoadmapPage.</p></div>
         </details>
         <details>
           <summary><code>web/src/api.ts</code> · <code>web/src/types.ts</code></summary>
-          <div class="content"><p>Минимальный fetch-клиент и типы API в snake_case.</p></div>
+          <div class="content"><p>Fetch-клиент и snake_case-типы API для directions, roadmap, courses, modules, resources, roadmap-связей и двухфазного импорта.</p></div>
         </details>
         <details>
           <summary><code>web/src/icons.tsx</code> · <code>web/src/styles.css</code></summary>
@@ -175,20 +187,41 @@ SQLite → миграции → seed Backend Go
     </details>
 
     <details>
-      <summary>6. Проверки и сборка <span class="role">что запускать перед изменениями</span></summary>
+      <summary>6. Курсы и материалы <span class="role">каталог, связи, preview-импорт</span></summary>
+      <div class="content">
+        <p>Курс хранит метаданные и упорядоченные модули. Модуль хранит статус, материалы и ссылки на темы roadmap. Удаление курса не уничтожает запись сразу: DELETE архивирует его, а дочерние данные остаются доступны для чтения.</p>
+        <details>
+          <summary>Ручной поток</summary>
+          <div class="content"><p>UI вызывает <code>POST /courses</code>, затем <code>POST /courses/{id}/modules</code> и <code>POST /course-modules/{id}/resources</code>. Для каждой связи используется <code>POST /course-modules/{id}/roadmap-links</code>; повторная связь получает 409.</p></div>
+        </details>
+        <details>
+          <summary>Импорт Markdown/JSON</summary>
+          <div class="content"><p><code>POST /courses/import/preview</code> только парсит и валидирует текст, возвращая <code>preview_id</code>, состав и срок действия. <code>POST /courses/import</code> принимает только этот идентификатор, забирает preview один раз и создаёт курс транзакционно.</p></div>
+        </details>
+        <details>
+          <summary><code>docs/COURSES_AND_MATERIALS_IMPLEMENTATION.md</code></summary>
+          <div class="content"><p>Подробный отчёт с обоснованием модели данных, контрактом API, форматами импорта, проверками, ограничениями и дальнейшими этапами.</p></div>
+        </details>
+      </div>
+    </details>
+
+    <details>
+      <summary>7. Проверки и сборка <span class="role">что запускать перед изменениями</span></summary>
       <div class="content">
         <div class="files">
           <div class="file"><strong><code>internal/app/http_test.go</code></strong>CRUD directions/nodes, статусы, move, cycles, dependencies, error format.</div>
+          <div class="file"><strong><code>internal/app/courses_test.go</code></strong>CRUD courses/modules/resources, roadmap-связи, архивирование и preview/import для Markdown и JSON.</div>
           <div class="file"><strong><code>internal/database/database_test.go</code></strong>Миграции и seed без дублей/восстановления удалённых тем.</div>
           <div class="file"><strong><code>web/src/RoadmapTree.test.tsx</code></strong>Рендер вложенного дерева и расчёт прогресса.</div>
           <div class="file"><strong><code>web/src/Dashboard.test.ts</code></strong>Классификация сегодняшних действий, просрочек, повторений, зависимостей и недельной активности.</div>
+          <div class="file"><strong><code>web/src/CoursesPage.test.ts</code></strong>Проверка адресов удалённых и локальных материалов.</div>
           <div class="file"><strong><code>Makefile</code></strong><code>make dev</code>, <code>make test</code>, <code>make lint</code>, <code>make build</code>, <code>make migrate</code>, <code>make seed</code>.</div>
-          <div class="file"><strong><code>README.md</code></strong>Запуск, пути данных, архитектура и ограничения этапов 1–2.</div>
+          <div class="file"><strong><code>README.md</code></strong>Запуск, пути данных, импорт курсов, архитектура и ограничения этапов 1–3.</div>
         </div>
       </div>
     </details>
   </main>
 
-  <p class="footer">Карта соответствует текущему срезу проекта. Следующие крупные модули по ТЗ: курсы, материалы, сессии/проекты, аналитика и backup.</p>
+  <p class="footer">Карта соответствует текущему срезу проекта. Следующие крупные модули по ТЗ: сессии/проекты, аналитика и backup.</p>
 </body>
 </html>

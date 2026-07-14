@@ -617,6 +617,7 @@ function NodeDetails({
         confidence,
         needs_review: needsReview,
         next_action: nextAction.trim(),
+        last_reviewed_at: new Date().toISOString(),
       })
       onSaved(updated)
       setSaved(true)
