@@ -145,7 +145,7 @@ func (a *Handler) courseByID(ctx context.Context, id int64) (Course, error) {
 	if err != nil {
 		return Course{}, err
 	}
-	moduleByID := make(map[int64]*CourseModule)
+	moduleIndexByID := make(map[int64]int)
 	for modules.Next() {
 		var module CourseModule
 		if err := modules.Scan(&module.ID, &module.CourseID, &module.Title, &module.Description,
@@ -156,7 +156,7 @@ func (a *Handler) courseByID(ctx context.Context, id int64) (Course, error) {
 		module.Resources = []CourseResource{}
 		module.RoadmapLinks = []CourseModuleRoadmapLink{}
 		course.Modules = append(course.Modules, module)
-		moduleByID[module.ID] = &course.Modules[len(course.Modules)-1]
+		moduleIndexByID[module.ID] = len(course.Modules) - 1
 	}
 	if err := modules.Close(); err != nil {
 		return Course{}, err
@@ -181,8 +181,8 @@ func (a *Handler) courseByID(ctx context.Context, id int64) (Course, error) {
 			resources.Close()
 			return Course{}, err
 		}
-		if module := moduleByID[resource.ModuleID]; module != nil {
-			module.Resources = append(module.Resources, resource)
+		if moduleIndex, ok := moduleIndexByID[resource.ModuleID]; ok {
+			course.Modules[moduleIndex].Resources = append(course.Modules[moduleIndex].Resources, resource)
 		}
 	}
 	if err := resources.Close(); err != nil {
@@ -209,8 +209,8 @@ func (a *Handler) courseByID(ctx context.Context, id int64) (Course, error) {
 			links.Close()
 			return Course{}, err
 		}
-		if module := moduleByID[link.ModuleID]; module != nil {
-			module.RoadmapLinks = append(module.RoadmapLinks, link)
+		if moduleIndex, ok := moduleIndexByID[link.ModuleID]; ok {
+			course.Modules[moduleIndex].RoadmapLinks = append(course.Modules[moduleIndex].RoadmapLinks, link)
 		}
 	}
 	if err := links.Close(); err != nil {
