@@ -60,6 +60,13 @@ export type CreateRoadmapNode = Pick<RoadmapNode, 'direction_id' | 'title'> &
 export type UpdateRoadmapNode = Partial<
   Pick<
     RoadmapNode,
-    'title' | 'description' | 'node_type' | 'status' | 'needs_review' | 'confidence' | 'next_action'
+    | 'title'
+    | 'description'
+    | 'node_type'
+    | 'status'
+    | 'needs_review'
+    | 'confidence'
+    | 'next_action'
+    | 'last_reviewed_at'
   >
 >
