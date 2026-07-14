@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -21,16 +22,23 @@ const maxBodyBytes = 1 << 20
 var Version = "dev"
 
 type App struct {
-	db     *sql.DB
-	logger *slog.Logger
-	mux    *http.ServeMux
+	db             *sql.DB
+	logger         *slog.Logger
+	mux            *http.ServeMux
+	importMu       sync.Mutex
+	importPreviews map[string]courseImportPreview
 }
 
 func New(db *sql.DB, logger *slog.Logger, frontend http.Handler) *App {
 	if logger == nil {
 		logger = slog.Default()
 	}
-	a := &App{db: db, logger: logger, mux: http.NewServeMux()}
+	a := &App{
+		db:             db,
+		logger:         logger,
+		mux:            http.NewServeMux(),
+		importPreviews: make(map[string]courseImportPreview),
+	}
 	a.routes()
 	if frontend != nil {
 		a.mux.Handle("/", frontend)
@@ -60,6 +68,22 @@ func (a *App) routes() {
 	a.mux.HandleFunc("POST /api/v1/roadmap/nodes/{id}/move", a.moveNode)
 	a.mux.HandleFunc("POST /api/v1/roadmap/nodes/{id}/dependencies", a.createDependency)
 	a.mux.HandleFunc("DELETE /api/v1/roadmap/nodes/{id}/dependencies/{dependencyId}", a.deleteDependency)
+
+	a.mux.HandleFunc("GET /api/v1/courses", a.listCourses)
+	a.mux.HandleFunc("POST /api/v1/courses", a.createCourse)
+	a.mux.HandleFunc("GET /api/v1/courses/{id}", a.getCourse)
+	a.mux.HandleFunc("PUT /api/v1/courses/{id}", a.updateCourse)
+	a.mux.HandleFunc("DELETE /api/v1/courses/{id}", a.archiveCourse)
+	a.mux.HandleFunc("POST /api/v1/courses/{id}/modules", a.createCourseModule)
+	a.mux.HandleFunc("POST /api/v1/courses/import/preview", a.previewCourseImport)
+	a.mux.HandleFunc("POST /api/v1/courses/import", a.importCourse)
+	a.mux.HandleFunc("PUT /api/v1/course-modules/{id}", a.updateCourseModule)
+	a.mux.HandleFunc("DELETE /api/v1/course-modules/{id}", a.deleteCourseModule)
+	a.mux.HandleFunc("POST /api/v1/course-modules/{id}/resources", a.createResource)
+	a.mux.HandleFunc("POST /api/v1/course-modules/{id}/roadmap-links", a.createRoadmapLink)
+	a.mux.HandleFunc("DELETE /api/v1/course-modules/{id}/roadmap-links/{linkId}", a.deleteRoadmapLink)
+	a.mux.HandleFunc("PUT /api/v1/resources/{id}", a.updateResource)
+	a.mux.HandleFunc("DELETE /api/v1/resources/{id}", a.deleteResource)
 	a.mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		a.problem(w, r, http.StatusNotFound, "ENDPOINT_NOT_FOUND", "API endpoint was not found", "route_request", 0, nil)
 	})

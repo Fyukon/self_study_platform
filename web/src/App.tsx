@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom'
+import { CoursesPage } from './CoursesPage'
 import { Dashboard } from './Dashboard'
 import { RoadmapPage } from './RoadmapPage'
 import { Icon } from './icons'
@@ -38,6 +39,12 @@ export function App() {
           >
             <Icon name="roadmap" size={18} /> Roadmap
           </NavLink>
+          <NavLink
+            to="/courses"
+            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+          >
+            <Icon name="book" size={18} /> Курсы
+          </NavLink>
           <a className="nav-link" href="/architecture.html">
             <Icon name="compass" size={18} /> Архитектура
           </a>
@@ -45,7 +52,6 @@ export function App() {
 
         <div className="future-nav" aria-label="Будущие разделы">
           <p>Следующие этапы</p>
-          <span><Icon name="book" size={15} /> Курсы</span>
           <span><Icon name="journal" size={15} /> Журнал</span>
           <span><Icon name="briefcase" size={15} /> Проекты</span>
           <span><Icon name="chart" size={15} /> Аналитика</span>
@@ -67,6 +73,7 @@ export function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/roadmap" element={<RoadmapPage />} />
           <Route path="/roadmap/:directionId" element={<RoadmapPage />} />
+          <Route path="/courses" element={<CoursesPage />} />
           <Route path="*" element={<Navigate to="/roadmap" replace />} />
         </Routes>
       </main>
