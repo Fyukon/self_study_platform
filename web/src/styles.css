@@ -2,29 +2,29 @@
   color-scheme: light;
   font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
-  --bg: #f5f3ec;
-  --panel: #fffdf8;
-  --panel-soft: #eff4ef;
-  --panel-strong: #e3ebe4;
-  --text: #24322d;
-  --muted: #66756d;
-  --faint: #89978f;
-  --border: #d6e0d8;
-  --accent: #3e735b;
-  --accent-strong: #2c5745;
-  --accent-soft: #e4f0e8;
-  --focus: #c68a43;
-  --danger: #b9685b;
-  --danger-soft: #f9e8e4;
-  --learning: #356c78;
-  --learning-soft: #e3f0f0;
-  --warning: #9a6424;
-  --warning-soft: #f5ecd8;
-  --success: #2f714f;
-  --success-soft: #e2f0e7;
-  --blocked: #65527b;
-  --blocked-soft: #ede8f4;
-  --shadow: 0 16px 46px rgba(45, 66, 55, 0.09);
+  --bg: #f7f0e5;
+  --panel: #fffbf4;
+  --panel-soft: #f3eadf;
+  --panel-strong: #e9dccb;
+  --text: #322a26;
+  --muted: #776b62;
+  --faint: #a0948a;
+  --border: #e1d2c1;
+  --accent: #8a5744;
+  --accent-strong: #6d3f32;
+  --accent-soft: #f2e2d8;
+  --focus: #b8783e;
+  --danger: #ab5b4d;
+  --danger-soft: #f7e4df;
+  --learning: #6b6271;
+  --learning-soft: #ece7ee;
+  --warning: #9b682f;
+  --warning-soft: #f5ead5;
+  --success: #7a6745;
+  --success-soft: #efe8d6;
+  --blocked: #735878;
+  --blocked-soft: #eee6f0;
+  --shadow: 0 16px 46px rgba(72, 50, 37, 0.1);
 }
 
 :root[data-theme="dark"] {
@@ -337,7 +337,7 @@ h2 {
   border: 1px solid var(--border);
   border-radius: 15px;
   background: var(--panel);
-  box-shadow: 0 8px 24px rgba(45, 66, 55, .05);
+  box-shadow: 0 8px 24px rgba(72, 50, 37, .05);
 }
 
 .today-stat {
@@ -1263,7 +1263,7 @@ textarea::placeholder {
   border: 1px solid var(--border);
   border-radius: 17px;
   background: var(--panel);
-  box-shadow: 0 12px 30px rgba(45, 66, 55, 0.08);
+  box-shadow: 0 12px 30px rgba(72, 50, 37, 0.08);
   animation: topic-card-in 240ms cubic-bezier(.2, .75, .25, 1) both;
   transform-origin: top right;
 }
@@ -1357,11 +1357,11 @@ textarea::placeholder {
   border-radius: 13px;
   background: var(--accent-strong);
   color: #fff;
-  box-shadow: 0 8px 16px rgba(44, 87, 69, .22);
+  box-shadow: 0 8px 16px rgba(109, 63, 50, .22);
 }
 
 .topic-icon-practice {
-  background: #92733a;
+  background: #9a6a34;
 }
 
 .topic-icon-project {
@@ -1369,7 +1369,7 @@ textarea::placeholder {
 }
 
 .topic-icon-checkpoint {
-  background: #3f7e70;
+  background: #7e6745;
 }
 
 .topic-hero-copy {
