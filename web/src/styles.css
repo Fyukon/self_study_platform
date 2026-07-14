@@ -2,21 +2,29 @@
   color-scheme: light;
   font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
-  --bg: #f4f5f7;
-  --panel: #ffffff;
-  --panel-soft: #f8f9fb;
-  --panel-strong: #eef0f4;
-  --text: #1e2530;
-  --muted: #697383;
-  --faint: #939bab;
-  --border: #e0e4e9;
-  --accent: #4969a8;
-  --accent-strong: #36568f;
-  --accent-soft: #e9eef9;
-  --focus: #7595d1;
-  --danger: #ad4545;
-  --danger-soft: #f9eaea;
-  --shadow: 0 16px 46px rgba(32, 42, 60, 0.13);
+  --bg: #f5f3ec;
+  --panel: #fffdf8;
+  --panel-soft: #eff4ef;
+  --panel-strong: #e3ebe4;
+  --text: #24322d;
+  --muted: #66756d;
+  --faint: #89978f;
+  --border: #d6e0d8;
+  --accent: #3e735b;
+  --accent-strong: #2c5745;
+  --accent-soft: #e4f0e8;
+  --focus: #c68a43;
+  --danger: #b9685b;
+  --danger-soft: #f9e8e4;
+  --learning: #356c78;
+  --learning-soft: #e3f0f0;
+  --warning: #9a6424;
+  --warning-soft: #f5ecd8;
+  --success: #2f714f;
+  --success-soft: #e2f0e7;
+  --blocked: #65527b;
+  --blocked-soft: #ede8f4;
+  --shadow: 0 16px 46px rgba(45, 66, 55, 0.09);
 }
 
 :root[data-theme="dark"] {
@@ -35,6 +43,14 @@
   --focus: #9ab8ed;
   --danger: #f08787;
   --danger-soft: #482b2d;
+  --learning: #9dd4d3;
+  --learning-soft: #29444a;
+  --warning: #f1c77d;
+  --warning-soft: #4a3b28;
+  --success: #a5d7b7;
+  --success-soft: #294738;
+  --blocked: #c0a8d4;
+  --blocked-soft: #40354c;
   --shadow: 0 18px 52px rgba(0, 0, 0, 0.38);
 }
 
@@ -321,7 +337,7 @@ h2 {
   border: 1px solid var(--border);
   border-radius: 15px;
   background: var(--panel);
-  box-shadow: 0 8px 24px rgba(32, 42, 60, .05);
+  box-shadow: 0 8px 24px rgba(45, 66, 55, .05);
 }
 
 .today-stat {
@@ -359,8 +375,8 @@ h2 {
 .today-stat-review .today-stat-icon,
 .today-list-mark-review,
 .today-topic-icon-review {
-  color: #87652a;
-  background: #f5ebd5;
+  color: var(--warning);
+  background: var(--warning-soft);
 }
 
 .today-stat-overdue .today-stat-icon,
@@ -371,15 +387,15 @@ h2 {
 }
 
 .today-stat-actions .today-stat-icon {
-  color: #397153;
-  background: #e2f1e8;
+  color: var(--success);
+  background: var(--success-soft);
 }
 
 .today-stat-blocked .today-stat-icon,
 .today-list-mark-blocked,
 .today-topic-icon-blocked {
-  color: var(--accent-strong);
-  background: var(--accent-soft);
+  color: var(--blocked);
+  background: var(--blocked-soft);
 }
 
 .today-card {
@@ -1191,18 +1207,18 @@ textarea::placeholder {
 }
 
 .status-learning {
-  background: #e7effd;
-  color: #3c609b;
+  background: var(--learning-soft);
+  color: var(--learning);
 }
 
 .status-practicing {
-  background: #f5ebd5;
-  color: #8a6728;
+  background: var(--warning-soft);
+  color: var(--warning);
 }
 
 .status-understood {
-  background: #e2f1e8;
-  color: #397153;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 :root[data-theme="dark"] .status-learning {
@@ -1247,7 +1263,7 @@ textarea::placeholder {
   border: 1px solid var(--border);
   border-radius: 17px;
   background: var(--panel);
-  box-shadow: 0 12px 30px rgba(32, 42, 60, 0.08);
+  box-shadow: 0 12px 30px rgba(45, 66, 55, 0.08);
   animation: topic-card-in 240ms cubic-bezier(.2, .75, .25, 1) both;
   transform-origin: top right;
 }
@@ -1341,7 +1357,7 @@ textarea::placeholder {
   border-radius: 13px;
   background: var(--accent-strong);
   color: #fff;
-  box-shadow: 0 8px 16px rgba(54, 86, 143, .22);
+  box-shadow: 0 8px 16px rgba(44, 87, 69, .22);
 }
 
 .topic-icon-practice {
