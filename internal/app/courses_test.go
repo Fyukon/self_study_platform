@@ -97,6 +97,27 @@ func TestHTTPCoursesAndMaterialsCRUD(t *testing.T) {
 	if link.NodeTitle != node.Title || link.DirectionTitle != direction.Title {
 		t.Fatalf("unexpected roadmap link: %+v", link)
 	}
+	secondModuleResponse := request(t, handler, http.MethodPost, modulePath, map[string]any{
+		"title": "Linux-практика",
+	})
+	if secondModuleResponse.Code != http.StatusCreated {
+		t.Fatalf("create second course module: %d %s", secondModuleResponse.Code, secondModuleResponse.Body.String())
+	}
+	secondModule := decodeResponse[CourseModule](t, secondModuleResponse)
+	secondResourceResponse := request(t, handler, http.MethodPost,
+		"/api/v1/course-modules/"+strconv.FormatInt(secondModule.ID, 10)+"/resources", map[string]any{
+			"title":         "Linux manual",
+			"resource_type": "article",
+			"url":           "https://example.com/linux-manual",
+		})
+	if secondResourceResponse.Code != http.StatusCreated {
+		t.Fatalf("create second module resource: %d %s", secondResourceResponse.Code, secondResourceResponse.Body.String())
+	}
+	secondLinkResponse := request(t, handler, http.MethodPost,
+		"/api/v1/course-modules/"+strconv.FormatInt(secondModule.ID, 10)+"/roadmap-links", map[string]any{"node_id": node.ID})
+	if secondLinkResponse.Code != http.StatusCreated {
+		t.Fatalf("create second module roadmap link: %d %s", secondLinkResponse.Code, secondLinkResponse.Body.String())
+	}
 	duplicateLinkResponse := request(t, handler, http.MethodPost, linkPath, map[string]any{"node_id": node.ID})
 	if duplicateLinkResponse.Code != http.StatusConflict || courseErrorCode(t, duplicateLinkResponse.Body.Bytes()) != "ROADMAP_LINK_EXISTS" {
 		t.Fatalf("duplicate roadmap link: %d %s", duplicateLinkResponse.Code, duplicateLinkResponse.Body.String())
@@ -120,7 +141,8 @@ func TestHTTPCoursesAndMaterialsCRUD(t *testing.T) {
 		t.Fatalf("get course: %d %s", getResponse.Code, getResponse.Body.String())
 	}
 	loaded := decodeResponse[Course](t, getResponse)
-	if len(loaded.Modules) != 1 || len(loaded.Modules[0].Resources) != 2 || len(loaded.Modules[0].RoadmapLinks) != 1 {
+	if len(loaded.Modules) != 2 || len(loaded.Modules[0].Resources) != 2 || len(loaded.Modules[0].RoadmapLinks) != 1 ||
+		len(loaded.Modules[1].Resources) != 1 || len(loaded.Modules[1].RoadmapLinks) != 1 {
 		t.Fatalf("nested course data was not loaded: %+v", loaded)
 	}
 	listResponse := request(t, handler, http.MethodGet, "/api/v1/courses", nil)
@@ -128,7 +150,7 @@ func TestHTTPCoursesAndMaterialsCRUD(t *testing.T) {
 		t.Fatalf("list courses: %d %s", listResponse.Code, listResponse.Body.String())
 	}
 	list := decodeResponse[[]CourseSummary](t, listResponse)
-	if len(list) != 1 || list[0].ModuleCount != 1 || list[0].ResourceCount != 2 {
+	if len(list) != 1 || list[0].ModuleCount != 2 || list[0].ResourceCount != 3 {
 		t.Fatalf("unexpected course summary: %+v", list)
 	}
 

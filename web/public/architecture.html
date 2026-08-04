@@ -126,23 +126,23 @@ SQLite → миграции → seed Backend Go
         <p>Все endpoints начинаются с <code>/api/v1</code>. Ошибки возвращаются как <code>error.code/message/details</code>; запросы логируются request_id, method, path, status и duration_ms.</p>
         <details>
           <summary><code>internal/app/app.go</code></summary>
-          <div class="content"><p>Маршруты, JSON-декодирование с body limit, recovery, request logging, health/version/settings.</p></div>
+          <div class="content"><p>Composition root: собирает settings, roadmap и courses, оставляет health/version и подключает общий HTTP middleware.</p></div>
         </details>
         <details>
-          <summary><code>internal/app/model.go</code></summary>
-          <div class="content"><p>Go-модели Settings, Direction, RoadmapNode и NodeDependency; общая валидация статусов и confidence.</p></div>
+          <summary><code>internal/shared/httpx/http.go</code></summary>
+          <div class="content"><p>Общий HTTP-транспорт: единый формат ошибок, строгий JSON decode, request_id, body limit, recovery, логирование и response writer.</p></div>
         </details>
         <details>
-          <summary><code>internal/app/settings_directions.go</code></summary>
-          <div class="content"><p>CRUD directions и settings. Удаление направления — архивирование, не физическое удаление.</p></div>
+          <summary><code>internal/modules/settings/</code></summary>
+          <div class="content"><p>Модель, handler и CRUD настроек приложения.</p></div>
         </details>
         <details>
-          <summary><code>internal/app/roadmap.go</code></summary>
-          <div class="content"><p>Рекурсивное дерево, CRUD узлов, move с проверкой циклов, зависимости и защита направления родителя.</p></div>
+          <summary><code>internal/modules/roadmap/</code></summary>
+          <div class="content"><p>Модели, handler, CRUD directions и рекурсивное дерево roadmap; move с проверкой циклов, зависимости и защита направления родителя.</p></div>
         </details>
         <details>
-          <summary><code>internal/app/courses.go</code></summary>
-          <div class="content"><p>CRUD курсов, модулей и ресурсов; связи модулей с roadmap; строгая валидация URL/локальных файлов; парсинг Markdown/JSON; одноразовый preview с TTL и транзакционный импорт.</p></div>
+          <summary><code>internal/modules/courses/</code></summary>
+          <div class="content"><p>Handler и доменная логика курсов, модулей и ресурсов; связи модулей с roadmap; строгая валидация URL/локальных файлов; парсинг Markdown/JSON; одноразовый preview с TTL и транзакционный импорт.</p></div>
         </details>
       </div>
     </details>
@@ -152,31 +152,31 @@ SQLite → миграции → seed Backend Go
       <div class="content">
         <p>React Router хранит выбранное направление в URL: <code>/roadmap/1</code> или <code>/roadmap?direction=1</code>. Поэтому прямые ссылки и обновление страницы не теряют контекст.</p>
         <details>
-          <summary><code>web/src/main.tsx</code> · <code>web/src/App.tsx</code></summary>
+          <summary><code>web/src/app/</code></summary>
           <div class="content"><p>Bootstrap React, BrowserRouter, навигация, темы и маршруты Dashboard/Roadmap.</p></div>
         </details>
         <details>
-          <summary><code>web/src/Dashboard.tsx</code></summary>
+          <summary><code>web/src/pages/DashboardPage.tsx</code></summary>
           <div class="content"><p>Экран «Сегодня»: загружает активные roadmap, вычисляет повторение, просрочки, доступные действия, блокировки зависимостями и недельную активность.</p></div>
         </details>
         <details>
-          <summary><code>web/src/RoadmapPage.tsx</code></summary>
+          <summary><code>web/src/pages/RoadmapPage.tsx</code></summary>
           <div class="content"><p>Загрузка directions/roadmap, выбор направления и темы из URL (<code>node</code>), создание узлов, анимированная карточка каждой темы с описанием, готовностью и следующим шагом, полноэкранный режим карточки с закрытием по <code>Esc</code>, редактирование прогресса, управление зависимостями и hotkeys <code>Esc/N/R</code>.</p></div>
         </details>
         <details>
-          <summary><code>web/src/CoursesPage.tsx</code></summary>
+          <summary><code>web/src/pages/CoursesPage.tsx</code></summary>
           <div class="content"><p>Библиотека курсов с ручным созданием, редактированием и архивированием; управление модулями и материалами; ссылки на HTTP-ресурсы и локальные файлы; выбор тем roadmap; import-панель, которая показывает preview до записи.</p></div>
         </details>
         <details>
-          <summary><code>web/src/RoadmapTree.tsx</code></summary>
+          <summary><code>web/src/features/roadmap/RoadmapTree.tsx</code></summary>
           <div class="content"><p>Рекурсивное дерево с раскрытием веток и текстовыми статусами; общий helper <code>flattenNodes</code> используется Dashboard и RoadmapPage.</p></div>
         </details>
         <details>
-          <summary><code>web/src/api.ts</code> · <code>web/src/types.ts</code></summary>
-          <div class="content"><p>Fetch-клиент и snake_case-типы API для directions, roadmap, courses, modules, resources, roadmap-связей и двухфазного импорта.</p></div>
+          <summary><code>web/src/features/*/api.ts</code></summary>
+          <div class="content"><p>Endpoint-клиенты доменных областей: roadmap, courses и settings; каждый feature владеет своим API-контрактом.</p></div>
         </details>
         <details>
-          <summary><code>web/src/icons.tsx</code> · <code>web/src/styles.css</code></summary>
+          <summary><code>web/src/shared/</code></summary>
           <div class="content"><p>Локальные inline SVG-иконки без UI-библиотеки, быстрые CSS-анимации карточек/скелетонов, кольца прогресса и общая светлая/тёмная тема.</p></div>
         </details>
         <details>
@@ -212,11 +212,12 @@ SQLite → миграции → seed Backend Go
           <div class="file"><strong><code>internal/app/http_test.go</code></strong>CRUD directions/nodes, статусы, move, cycles, dependencies, error format.</div>
           <div class="file"><strong><code>internal/app/courses_test.go</code></strong>CRUD courses/modules/resources, roadmap-связи, архивирование и preview/import для Markdown и JSON.</div>
           <div class="file"><strong><code>internal/database/database_test.go</code></strong>Миграции и seed без дублей/восстановления удалённых тем.</div>
-          <div class="file"><strong><code>web/src/RoadmapTree.test.tsx</code></strong>Рендер вложенного дерева и расчёт прогресса.</div>
-          <div class="file"><strong><code>web/src/Dashboard.test.ts</code></strong>Классификация сегодняшних действий, просрочек, повторений, зависимостей и недельной активности.</div>
-          <div class="file"><strong><code>web/src/CoursesPage.test.ts</code></strong>Проверка адресов удалённых и локальных материалов.</div>
+          <div class="file"><strong><code>web/src/features/roadmap/RoadmapTree.test.tsx</code></strong>Рендер вложенного дерева и расчёт прогресса.</div>
+          <div class="file"><strong><code>web/src/pages/DashboardPage.test.ts</code></strong>Классификация сегодняшних действий, просрочек, повторений, зависимостей и недельной активности.</div>
+          <div class="file"><strong><code>web/src/pages/CoursesPage.test.ts</code></strong>Проверка адресов удалённых и локальных материалов.</div>
           <div class="file"><strong><code>Makefile</code></strong><code>make dev</code>, <code>make test</code>, <code>make lint</code>, <code>make build</code>, <code>make migrate</code>, <code>make seed</code>.</div>
           <div class="file"><strong><code>README.md</code></strong>Запуск, пути данных, импорт курсов, архитектура и ограничения этапов 1–3.</div>
+          <div class="file"><strong><code>deploy/update.sh</code></strong>Деплой на сервер GerPRO: git-клон приватного репозитория через read-only deploy key, сборка и перезапуск systemd-сервиса.</div>
         </div>
       </div>
     </details>

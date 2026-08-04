@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { calculateProgress, RoadmapTree } from './RoadmapTree'
-import type { RoadmapNode } from './types'
+import type { RoadmapNode } from '../../shared/types'
 
 let nextId = 1
 

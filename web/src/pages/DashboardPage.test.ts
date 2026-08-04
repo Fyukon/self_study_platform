@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { summarizeToday, type RoadmapSnapshot } from './Dashboard'
-import type { Direction, RoadmapNode } from './types'
+import { summarizeToday, type RoadmapSnapshot } from './DashboardPage'
+import type { Direction, RoadmapNode } from '../shared/types'
 
 const direction: Direction = {
   id: 1,

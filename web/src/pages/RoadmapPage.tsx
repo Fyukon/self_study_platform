@@ -1,8 +1,8 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react'
-import { api } from './api'
-import { calculateProgress, flattenNodes, RoadmapTree, statusLabels } from './RoadmapTree'
-import type { Direction, NodeType, RoadmapNode, RoadmapStatus } from './types'
-import { Icon, type IconName } from './icons'
+import { roadmapApi } from '../features/roadmap/api'
+import { calculateProgress, flattenNodes, RoadmapTree, statusLabels } from '../features/roadmap/RoadmapTree'
+import type { Direction, NodeType, RoadmapNode, RoadmapStatus } from '../shared/types'
+import { Icon, type IconName } from '../shared/components/Icon'
 import { useParams, useSearchParams } from 'react-router-dom'
 
 const nodeTypeLabels: Record<NodeType, string> = {
@@ -114,7 +114,7 @@ export function RoadmapPage() {
     const controller = new AbortController()
     setDirectionsLoading(true)
     setDirectionsError('')
-    api.directions(controller.signal)
+    roadmapApi.directions(controller.signal)
       .then((items) => {
         setDirections(items)
         const requestedID = directionIDFromReference(items, requestedDirection)
@@ -143,7 +143,7 @@ export function RoadmapPage() {
     const controller = new AbortController()
     setRoadmapLoading(true)
     setRoadmapError('')
-    api.roadmap(directionId, controller.signal)
+    roadmapApi.roadmap(directionId, controller.signal)
       .then(setNodes)
       .catch((error) => {
         if (!(error instanceof DOMException && error.name === 'AbortError')) {
@@ -460,7 +460,7 @@ function DirectionForm({ onCancel, onCreated }: { onCancel: () => void; onCreate
     setSaving(true)
     setError('')
     try {
-      onCreated(await api.createDirection({ title: title.trim(), description: description.trim() }))
+      onCreated(await roadmapApi.createDirection({ title: title.trim(), description: description.trim() }))
     } catch (requestError) {
       setError(errorMessage(requestError))
     } finally {
@@ -512,7 +512,7 @@ function NodeForm({
     setSaving(true)
     setError('')
     try {
-      onCreated(await api.createNode({
+      onCreated(await roadmapApi.createNode({
         direction_id: directionId,
         parent_id: parentId,
         title: title.trim(),
@@ -612,7 +612,7 @@ function NodeDetails({
     setSaved(false)
     setError('')
     try {
-      const updated = await api.updateNode(node.id, {
+      const updated = await roadmapApi.updateNode(node.id, {
         status,
         confidence,
         needs_review: needsReview,
@@ -633,7 +633,7 @@ function NodeDetails({
     setDeleting(true)
     setError('')
     try {
-      await api.deleteNode(node.id)
+      await roadmapApi.deleteNode(node.id)
       onDeleted(node.id)
     } catch (requestError) {
       setError(errorMessage(requestError))
@@ -646,7 +646,7 @@ function NodeDetails({
     setChangingDependency(true)
     setError('')
     try {
-      await api.createDependency(node.id, dependencyNodeId)
+      await roadmapApi.createDependency(node.id, dependencyNodeId)
       setDependencyNodeId(null)
       onDependenciesChanged()
     } catch (requestError) {
@@ -660,7 +660,7 @@ function NodeDetails({
     setChangingDependency(true)
     setError('')
     try {
-      await api.deleteDependency(node.id, dependencyId)
+      await roadmapApi.deleteDependency(node.id, dependencyId)
       onDependenciesChanged()
     } catch (requestError) {
       setError(errorMessage(requestError))

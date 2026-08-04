@@ -12,6 +12,20 @@ export interface Direction {
   updated_at: string
 }
 
+export interface Settings {
+  id: number
+  application_name: string
+  timezone: string
+  week_starts_on: number
+  database_path: string
+  backup_path: string
+  theme: 'light' | 'dark' | 'system'
+  created_at: string
+  updated_at: string
+}
+
+export type UpdateSettings = Partial<Omit<Settings, 'id' | 'created_at' | 'updated_at'>>
+
 export interface NodeDependency {
   id: number
   node_id: number

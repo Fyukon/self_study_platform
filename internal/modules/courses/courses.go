@@ -1,4 +1,4 @@
-package app
+package courses
 
 import (
 	"context"
@@ -100,7 +100,7 @@ type CourseModuleRoadmapLink struct {
 const courseColumns = `id, title, description, provider, source_url, position,
 	is_archived, created_at, updated_at`
 
-func (a *App) listCourses(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) listCourses(w http.ResponseWriter, r *http.Request) {
 	rows, err := a.db.QueryContext(r.Context(), `SELECT c.id, c.title, c.description, c.provider,
 		c.source_url, c.position, c.is_archived, c.created_at, c.updated_at,
 		(SELECT COUNT(*) FROM course_modules m WHERE m.course_id = c.id),
@@ -130,7 +130,7 @@ func (a *App) listCourses(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, courses)
 }
 
-func (a *App) courseByID(ctx context.Context, id int64) (Course, error) {
+func (a *Handler) courseByID(ctx context.Context, id int64) (Course, error) {
 	var course Course
 	err := a.db.QueryRowContext(ctx, `SELECT `+courseColumns+` FROM courses WHERE id = ?`, id).Scan(
 		&course.ID, &course.Title, &course.Description, &course.Provider, &course.SourceURL,
@@ -145,7 +145,7 @@ func (a *App) courseByID(ctx context.Context, id int64) (Course, error) {
 	if err != nil {
 		return Course{}, err
 	}
-	moduleByID := make(map[int64]*CourseModule)
+	moduleIndexByID := make(map[int64]int)
 	for modules.Next() {
 		var module CourseModule
 		if err := modules.Scan(&module.ID, &module.CourseID, &module.Title, &module.Description,
@@ -156,7 +156,7 @@ func (a *App) courseByID(ctx context.Context, id int64) (Course, error) {
 		module.Resources = []CourseResource{}
 		module.RoadmapLinks = []CourseModuleRoadmapLink{}
 		course.Modules = append(course.Modules, module)
-		moduleByID[module.ID] = &course.Modules[len(course.Modules)-1]
+		moduleIndexByID[module.ID] = len(course.Modules) - 1
 	}
 	if err := modules.Close(); err != nil {
 		return Course{}, err
@@ -181,8 +181,8 @@ func (a *App) courseByID(ctx context.Context, id int64) (Course, error) {
 			resources.Close()
 			return Course{}, err
 		}
-		if module := moduleByID[resource.ModuleID]; module != nil {
-			module.Resources = append(module.Resources, resource)
+		if moduleIndex, ok := moduleIndexByID[resource.ModuleID]; ok {
+			course.Modules[moduleIndex].Resources = append(course.Modules[moduleIndex].Resources, resource)
 		}
 	}
 	if err := resources.Close(); err != nil {
@@ -209,8 +209,8 @@ func (a *App) courseByID(ctx context.Context, id int64) (Course, error) {
 			links.Close()
 			return Course{}, err
 		}
-		if module := moduleByID[link.ModuleID]; module != nil {
-			module.RoadmapLinks = append(module.RoadmapLinks, link)
+		if moduleIndex, ok := moduleIndexByID[link.ModuleID]; ok {
+			course.Modules[moduleIndex].RoadmapLinks = append(course.Modules[moduleIndex].RoadmapLinks, link)
 		}
 	}
 	if err := links.Close(); err != nil {
@@ -222,7 +222,7 @@ func (a *App) courseByID(ctx context.Context, id int64) (Course, error) {
 	return course, nil
 }
 
-func (a *App) getCourse(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) getCourse(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_COURSE_ID", "Course id is invalid", "get_course", 0, err)
@@ -270,7 +270,7 @@ func validateHTTPURL(value, field string) error {
 	return nil
 }
 
-func (a *App) createCourse(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) createCourse(w http.ResponseWriter, r *http.Request) {
 	var input courseCreateInput
 	if !a.decodeOrProblem(w, r, &input, "create_course") {
 		return
@@ -318,7 +318,7 @@ type courseUpdateInput struct {
 	IsArchived  *bool   `json:"is_archived"`
 }
 
-func (a *App) updateCourse(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) updateCourse(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_COURSE_ID", "Course id is invalid", "update_course", 0, err)
@@ -375,7 +375,7 @@ func (a *App) updateCourse(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, course)
 }
 
-func (a *App) archiveCourse(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) archiveCourse(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_COURSE_ID", "Course id is invalid", "archive_course", 0, err)
@@ -412,7 +412,7 @@ func validateCourseModule(title, status string) error {
 	return nil
 }
 
-func (a *App) readModule(ctx context.Context, id int64) (CourseModule, error) {
+func (a *Handler) readModule(ctx context.Context, id int64) (CourseModule, error) {
 	var module CourseModule
 	err := a.db.QueryRowContext(ctx, `SELECT id, course_id, title, description, status,
 		position, created_at, updated_at FROM course_modules WHERE id = ?`, id).Scan(
@@ -426,7 +426,7 @@ func (a *App) readModule(ctx context.Context, id int64) (CourseModule, error) {
 	return module, nil
 }
 
-func (a *App) createCourseModule(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) createCourseModule(w http.ResponseWriter, r *http.Request) {
 	courseID, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_COURSE_ID", "Course id is invalid", "create_course_module", 0, err)
@@ -488,7 +488,7 @@ type courseModuleUpdateInput struct {
 	Position    *int    `json:"position"`
 }
 
-func (a *App) updateCourseModule(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) updateCourseModule(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_COURSE_MODULE_ID", "Course module id is invalid", "update_course_module", 0, err)
@@ -538,7 +538,7 @@ func (a *App) updateCourseModule(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, module)
 }
 
-func (a *App) deleteCourseModule(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) deleteCourseModule(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_COURSE_MODULE_ID", "Course module id is invalid", "delete_course_module", 0, err)
@@ -604,7 +604,7 @@ func validateResource(title, resourceType, resourceURL, localPath string) error 
 	return nil
 }
 
-func (a *App) readResource(ctx context.Context, id int64) (CourseResource, error) {
+func (a *Handler) readResource(ctx context.Context, id int64) (CourseResource, error) {
 	var resource CourseResource
 	err := a.db.QueryRowContext(ctx, `SELECT id, module_id, title, resource_type, url, local_path,
 		note, position, created_at, updated_at FROM resources WHERE id = ?`, id).Scan(
@@ -613,7 +613,7 @@ func (a *App) readResource(ctx context.Context, id int64) (CourseResource, error
 	return resource, err
 }
 
-func (a *App) createResource(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) createResource(w http.ResponseWriter, r *http.Request) {
 	moduleID, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_COURSE_MODULE_ID", "Course module id is invalid", "create_resource", 0, err)
@@ -681,7 +681,7 @@ type resourceUpdateInput struct {
 	Position     *int    `json:"position"`
 }
 
-func (a *App) updateResource(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) updateResource(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_RESOURCE_ID", "Resource id is invalid", "update_resource", 0, err)
@@ -738,7 +738,7 @@ func (a *App) updateResource(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, resource)
 }
 
-func (a *App) deleteResource(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) deleteResource(w http.ResponseWriter, r *http.Request) {
 	id, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_RESOURCE_ID", "Resource id is invalid", "delete_resource", 0, err)
@@ -761,7 +761,7 @@ type roadmapLinkCreateInput struct {
 	NodeID int64 `json:"node_id"`
 }
 
-func (a *App) readRoadmapLink(ctx context.Context, id int64) (CourseModuleRoadmapLink, error) {
+func (a *Handler) readRoadmapLink(ctx context.Context, id int64) (CourseModuleRoadmapLink, error) {
 	var link CourseModuleRoadmapLink
 	err := a.db.QueryRowContext(ctx, `SELECT link.id, link.module_id, link.node_id, n.title,
 		d.id, d.title, link.created_at FROM course_module_roadmap_links link
@@ -771,7 +771,7 @@ func (a *App) readRoadmapLink(ctx context.Context, id int64) (CourseModuleRoadma
 	return link, err
 }
 
-func (a *App) createRoadmapLink(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) createRoadmapLink(w http.ResponseWriter, r *http.Request) {
 	moduleID, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_COURSE_MODULE_ID", "Course module id is invalid", "create_roadmap_link", 0, err)
@@ -826,7 +826,7 @@ func (a *App) createRoadmapLink(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, link)
 }
 
-func (a *App) deleteRoadmapLink(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) deleteRoadmapLink(w http.ResponseWriter, r *http.Request) {
 	moduleID, err := pathID(r, "id")
 	if err != nil {
 		a.problem(w, r, http.StatusBadRequest, "INVALID_COURSE_MODULE_ID", "Course module id is invalid", "delete_roadmap_link", 0, err)
@@ -901,7 +901,7 @@ type courseImportSummary struct {
 	Resources int `json:"resources"`
 }
 
-func (a *App) storeCoursePreview(format string, document courseImportDocument) string {
+func (a *Handler) storeCoursePreview(format string, document courseImportDocument) string {
 	now := time.Now()
 	previewID := newRequestID()
 	a.importMu.Lock()
@@ -919,7 +919,7 @@ func (a *App) storeCoursePreview(format string, document courseImportDocument) s
 	return previewID
 }
 
-func (a *App) takeCoursePreview(previewID string) (courseImportPreview, bool) {
+func (a *Handler) takeCoursePreview(previewID string) (courseImportPreview, bool) {
 	a.importMu.Lock()
 	preview, ok := a.importPreviews[previewID]
 	if ok {
@@ -932,7 +932,7 @@ func (a *App) takeCoursePreview(previewID string) (courseImportPreview, bool) {
 	return preview, true
 }
 
-func (a *App) previewCourseImport(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) previewCourseImport(w http.ResponseWriter, r *http.Request) {
 	var input courseImportRequest
 	if !a.decodeOrProblem(w, r, &input, "preview_course_import") {
 		return
@@ -1112,7 +1112,7 @@ func normalizeAndValidateImport(document *courseImportDocument) (courseImportDoc
 	return *document, nil
 }
 
-func (a *App) importCourse(w http.ResponseWriter, r *http.Request) {
+func (a *Handler) importCourse(w http.ResponseWriter, r *http.Request) {
 	var input courseImportCommitRequest
 	if !a.decodeOrProblem(w, r, &input, "import_course") {
 		return
@@ -1135,7 +1135,7 @@ func (a *App) importCourse(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, course)
 }
 
-func (a *App) insertImportedCourse(ctx context.Context, document courseImportDocument) (Course, error) {
+func (a *Handler) insertImportedCourse(ctx context.Context, document courseImportDocument) (Course, error) {
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return Course{}, err
