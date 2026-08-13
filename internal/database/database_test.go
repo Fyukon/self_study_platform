@@ -39,10 +39,10 @@ func TestMigrateAndSeedAreIdempotent(t *testing.T) {
 	if err := db.QueryRow(`SELECT COUNT(*) FROM node_dependencies`).Scan(&dependenciesBefore); err != nil {
 		t.Fatal(err)
 	}
-	if directionsBefore != 3 || nodesBefore == 0 || dependenciesBefore == 0 {
+	if directionsBefore != 2 || nodesBefore == 0 || dependenciesBefore == 0 {
 		t.Fatalf("incomplete seed: directions=%d nodes=%d dependencies=%d", directionsBefore, nodesBefore, dependenciesBefore)
 	}
-	var rustNodes, mathNodes int
+	var rustNodes, mathNodes, goDirections int
 	if err := db.QueryRow(`SELECT COUNT(*) FROM roadmap_nodes WHERE seed_key LIKE 'rust.%'`).Scan(&rustNodes); err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,13 @@ func TestMigrateAndSeedAreIdempotent(t *testing.T) {
 	if mathNodes == 0 {
 		t.Fatal("math roadmap was not seeded")
 	}
-	if _, err := db.Exec(`DELETE FROM roadmap_nodes WHERE seed_key = 'backend-go.backend-foundations.dns'`); err != nil {
+	if err := db.QueryRow(`SELECT COUNT(*) FROM directions WHERE seed_key = 'backend-go'`).Scan(&goDirections); err != nil {
+		t.Fatal(err)
+	}
+	if goDirections != 0 {
+		t.Fatal("backend Go roadmap must not be seeded")
+	}
+	if _, err := db.Exec(`DELETE FROM roadmap_nodes WHERE seed_key = 'rust.terminal.shell-basics'`); err != nil {
 		t.Fatal(err)
 	}
 	if err := Seed(ctx, db); err != nil {
