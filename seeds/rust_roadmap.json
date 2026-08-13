@@ -1,0 +1,198 @@
+{
+  "seed_key": "rust",
+  "title": "Rust: Systems & Backend",
+  "description": "Линейный практический roadmap Rust с нуля: Fedora terminal, tmux, LazyVim, ownership и память, системное программирование, threads, networking, async backend, WASM/embedded/TUI. Режим: около 1 часа в день, каждый узел заканчивается кодом, измерением, тестом или коммитом.",
+  "nodes": [
+    {
+      "seed_key": "rust.terminal",
+      "title": "Терминал и Unix-мышление",
+      "description": "Собрать рабочий набор команд для Fedora и научиться понимать процессы, файлы, потоки и сеть.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 1,
+      "next_action": "Создать ~/study/rust-labs и выполнить 15 файловых операций без GUI",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"rust.terminal.shell-basics","title":"Навигация, файлы и помощь","description":"cd, pwd, ls, mkdir, cp, mv, rm, man, --help. Практика: создать учебное дерево каталогов только из терминала.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Создать ~/study/rust-labs и выполнить 15 файловых операций без GUI","target_date":null,"estimated_hours":1,"children":[]},
+        {"seed_key":"rust.terminal.pipes-redirection","title":"Потоки, pipe и redirection","description":"stdin/stdout/stderr, |, >, >>, 2>, tee. Практика: собрать pipeline из 3 команд.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Собрать pipeline, который фильтрует лог и сохраняет результат","target_date":null,"estimated_hours":1,"children":[]},
+        {"seed_key":"rust.terminal.search-text","title":"grep, find, xargs, sed, awk","description":"Поиск файлов и текста, передача результатов между командами. Практика на каталоге проекта.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":3,"next_action":"Найти все TODO в проекте, отсортировать и сохранить отчет","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.terminal.processes","title":"Процессы и сигналы","description":"ps, pgrep, top/btop, kill, pkill, jobs, fg/bg, nohup. Связать с процессами ОС.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":4,"next_action":"Запустить долгий процесс, найти PID и корректно завершить сигналом","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.terminal.permissions-env","title":"Права и окружение","description":"chmod, umask, env, export, PATH. Базово вспомнить user/group/other.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":5,"next_action":"Создать скрипт, сделать исполняемым и передать ему конфигурацию через env","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.terminal.network-cli","title":"Сеть из терминала","description":"curl, ss, dig, nc. Понять порт, listening socket и TCP-соединение.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":6,"next_action":"Поднять локальный listener через nc и обменяться данными между двумя терминалами","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.terminal.terminal-checkpoint","title":"Checkpoint: терминальный квест","description":"Без GUI найти процесс, порт, файл конфигурации и нужные строки в логах.","node_type":"checkpoint","status":"not_started","needs_review":false,"confidence":1,"position":7,"next_action":"Пройти терминальный квест за 30 минут и записать команды в notes.md","target_date":null,"estimated_hours":1,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "rust.nvim",
+      "title": "Neovim и LazyVim параллельно",
+      "description": "Перейти от Zed к рабочему терминальному редактору постепенно, не тормозя изучение Rust.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 2,
+      "next_action": "Отредактировать небольшой файл 20 минут без мыши и стрелок",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"rust.nvim.vim-motions","title":"Vim motions","description":"Normal/Insert/Visual, hjkl, w/b/e, 0/$, gg/G, f/t, ci/di/yi, undo/redo.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Отредактировать небольшой файл 20 минут без мыши и стрелок","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.nvim.lazyvim-install","title":"Установка LazyVim","description":"Поставить Neovim/LazyVim отдельно, проверить :LazyHealth, не удаляя Zed.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Запустить LazyVim и пройти :LazyHealth без критических ошибок","target_date":null,"estimated_hours":1,"children":[]},
+        {"seed_key":"rust.nvim.lazyvim-navigation","title":"Навигация в LazyVim","description":"Файлы, buffers, grep, telescope-поиск, splits, quickfix/location list.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":3,"next_action":"Открыть проект и найти/изменить символы только средствами LazyVim","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.nvim.rust-lsp","title":"Rust IDE в Neovim","description":"rust-analyzer, diagnostics, hover, go-to-definition, rename, code actions, formatting.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":4,"next_action":"Открыть Rust crate и выполнить rename + go-to-definition + format","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.nvim.nvim-debug-tests","title":"Тесты и отладка из редактора","description":"Запуск cargo test, diagnostics, terminal integration; DAP оставить после базы Rust.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":5,"next_action":"Запустить тесты проекта из LazyVim и исправить намеренно сломанный тест","target_date":null,"estimated_hours":1,"children":[]},
+        {"seed_key":"rust.nvim.nvim-checkpoint","title":"Checkpoint: день без Zed","description":"Полный учебный час провести в tmux + LazyVim.","node_type":"checkpoint","status":"not_started","needs_review":false,"confidence":1,"position":6,"next_action":"Сделать один Rust lab целиком в Ghostty + tmux + LazyVim","target_date":null,"estimated_hours":1,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "rust.rust-core",
+      "title": "Rust с нуля",
+      "description": "Освоить toolchain, типы и модель языка через короткие программы.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 3,
+      "next_action": "Создать rust-labs workspace и сделать первый commit",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"rust.rust-core.toolchain","title":"rustup, rustc и cargo","description":"Установить stable toolchain, rustfmt, clippy; cargo new/run/check/build/test/doc.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Создать rust-labs workspace и сделать первый commit","target_date":null,"estimated_hours":1,"children":[]},
+        {"seed_key":"rust.rust-core.bindings-types","title":"Bindings и типы","description":"let/mut, shadowing, scalar/compound types, tuples, arrays; сравнить с C++.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Написать CLI-конвертер единиц без внешних crates","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.rust-core.control-flow","title":"Управление потоком","description":"if, loop, while, for, match как expression.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":3,"next_action":"Написать угадайку с match и обработкой неверного ввода","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.rust-core.functions-modules","title":"Функции и модули","description":"Functions, expressions/statements, modules, visibility, crate layout.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":4,"next_action":"Разбить мини-проект на lib.rs + modules и покрыть тестами","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.rust-core.struct-enum","title":"Struct, enum, Option и match","description":"Моделирование состояний типами, pattern matching.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":5,"next_action":"Сделать конечный автомат состояния загрузки файла","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.rust-core.collections","title":"String, Vec, HashMap","description":"Владение коллекциями, индексация, entry API, UTF-8 ограничения String.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":6,"next_action":"Написать анализатор текста: частоты слов и top-N","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.rust-core.errors","title":"Result и ошибки","description":"Result, ?, panic, custom errors без усложнения.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":7,"next_action":"Сделать CLI, который читает файл и возвращает понятные ошибки","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.rust-core.traits-generics","title":"Traits и generics","description":"Trait bounds, impl Trait, generics; сравнить с templates C++.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":8,"next_action":"Реализовать generic min/max и trait для форматирования отчета","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.rust-core.iterators-closures","title":"Closures и iterators","description":"Iterator adapters, ownership в closures, collect, map/filter/fold.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":9,"next_action":"Переписать анализатор текста в iterator-style и сравнить читаемость","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.rust-core.core-checkpoint","title":"Checkpoint: CLI log analyzer","description":"CLI принимает файл логов, фильтр и выводит статистику; тесты + clippy.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":10,"next_action":"Собрать log-analyzer без копирования готового решения","target_date":null,"estimated_hours":4,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "rust.ownership",
+      "title": "Ownership, borrowing и память",
+      "description": "Глубоко разобрать главное отличие Rust: память без GC через правила владения.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 4,
+      "next_action": "Нарисовать память для C++ примера и перечислить 3 возможные ошибки",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"rust.ownership.memory-refresh","title":"Память: C++ refresh","description":"Stack/heap, RAII, references/pointers, dangling pointer, use-after-free, double free.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Нарисовать память для C++ примера и перечислить 3 возможные ошибки","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.ownership.ownership-moves","title":"Ownership и move","description":"Правила ownership, move/copy, drop; читать сообщения borrow checker.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Написать 10 маленьких примеров move/copy и объяснить каждый","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.ownership.borrowing","title":"Borrowing","description":"&T, &mut T, aliasing rules, reborrowing; сравнить с C++ references.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":3,"next_action":"Исправить 8 borrow-checker задач без clone как первого решения","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.ownership.slices","title":"Slices и строки","description":"&[T], &str, UTF-8, borrowed views.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":4,"next_action":"Написать функции парсинга, возвращающие slices без allocation","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.ownership.lifetimes","title":"Lifetimes","description":"Почему ссылки должны быть валидны, lifetime elision, явные lifetimes.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":5,"next_action":"Решить набор функций с lifetime-аннотациями и объяснить связи ссылок","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.ownership.smart-pointers","title":"Box, Rc, RefCell","description":"Heap ownership, shared ownership, interior mutability; когда какой тип нужен.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":6,"next_action":"Построить маленькое дерево на Rc<RefCell<_>> и описать цену решения","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.ownership.arc-mutex","title":"Arc, Mutex, RwLock","description":"Переход от single-thread shared state к thread-safe ownership.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":7,"next_action":"Сделать общий счетчик из нескольких threads без data race","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.ownership.drop-deref","title":"Drop и Deref","description":"RAII в Rust, destructors, deref coercion; связь с C++.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":8,"next_action":"Сделать тип-guard, который логирует acquire/release ресурса","target_date":null,"estimated_hours":2,"children":[]},
+        {"seed_key":"rust.ownership.ownership-checkpoint","title":"Checkpoint: объяснить borrow checker","description":"Разобрать программу с ownership от stack/heap до Drop и Send/Sync.","node_type":"checkpoint","status":"not_started","needs_review":false,"confidence":1,"position":9,"next_action":"Записать собственный конспект: почему код безопасен без GC","target_date":null,"estimated_hours":2,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "rust.systems",
+      "title": "Системное программирование",
+      "description": "Научиться работать ближе к ОС и понимать стоимость абстракций.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 5,
+      "next_action": "Написать быстрый копировщик файлов с измерением throughput",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"rust.systems.files-io","title":"Файлы и buffered I/O","description":"Read/Write, BufReader/BufWriter, paths, metadata.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Написать быстрый копировщик файлов с измерением throughput","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.systems.process-api","title":"Процессы из Rust","description":"std::process::Command, exit status, pipes, env.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Сделать мини-runner, запускающий команды и собирающий stdout/stderr","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.systems.threads","title":"Threads","description":"spawn/join, move closures, scoped threads, panic boundaries.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":3,"next_action":"Параллельно обработать набор файлов несколькими threads","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.systems.channels","title":"Message passing","description":"mpsc/sync channels, producer-consumer, backpressure concept.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":4,"next_action":"Сделать worker pool с очередью заданий","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.systems.atomics","title":"Atomics и memory ordering","description":"Atomic types, Ordering; сначала SeqCst, затем Acquire/Release концептуально.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":5,"next_action":"Сделать atomic counter и сравнить с Mutex через benchmark","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.systems.unsafe","title":"Unsafe Rust","description":"Raw pointers, unsafe blocks/functions, FFI contracts, invariants.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":6,"next_action":"Написать безопасную обертку над маленькой unsafe-функцией и задокументировать invariant","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.systems.ffi-c","title":"FFI с C","description":"extern C, ABI, CString/CStr, ownership across FFI.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":7,"next_action":"Вызвать C-функцию из Rust и завернуть её в safe API","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.systems.systems-checkpoint","title":"Checkpoint: parallel file indexer","description":"Индексатор каталога: threads, channels, filesystem, graceful errors.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":8,"next_action":"Сделать file-indexer и измерить его на большом каталоге","target_date":null,"estimated_hours":5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "rust.networking",
+      "title": "Сеть и многопоточность",
+      "description": "Перейти от TCP-примитивов к собственному конкурентному серверу.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 6,
+      "next_action": "Сделать echo-server и клиент, корректно обрабатывающие partial I/O",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"rust.networking.tcp-basics","title":"TCP в Rust","description":"TcpListener/TcpStream, blocking I/O, framing, partial reads/writes.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Сделать echo-server и клиент, корректно обрабатывающие partial I/O","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.networking.protocol","title":"Собственный протокол","description":"Framing, length-prefix, serialization руками, error handling.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Спроектировать простой key-value протокол и написать parser tests","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.networking.thread-per-conn","title":"Thread per connection","description":"Простой concurrency model и его пределы.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":3,"next_action":"Сервер обслуживает несколько клиентов отдельными threads","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.networking.thread-pool","title":"Thread pool","description":"Очередь задач, workers, graceful shutdown, panic isolation.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":4,"next_action":"Заменить thread-per-connection собственным thread pool","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.networking.shared-store","title":"Concurrent state","description":"Arc<RwLock<_>>, sharding concept, contention.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":5,"next_action":"Добавить in-memory key-value store и конкурентные тесты","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.networking.persistence","title":"Persistence","description":"Append-only log, recovery, fsync concept, corruption handling.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":6,"next_action":"Добавить WAL-подобный append log и восстановление после restart","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.networking.load-testing","title":"Нагрузочное тестирование","description":"Latency/throughput, p50/p95/p99, saturation, flamegraph concept.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":7,"next_action":"Написать load client и снять throughput + p95","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.networking.network-checkpoint","title":"Project v1: Ferrum server","description":"Многопоточный TCP key-value server: protocol, pool, persistence, tests, benchmark.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":8,"next_action":"Собрать v1 сервера и выдержать 10k+ запросов локального load-test","target_date":null,"estimated_hours":8,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "rust.backend",
+      "title": "Backend и async",
+      "description": "После понимания threads изучить async и production-паттерны backend на Rust.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 7,
+      "next_action": "Нарисовать lifecycle Future и написать 3 async-функции",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"rust.backend.async-model","title":"Future, async/await и runtime","description":"Future/poll/waker концептуально, blocking vs async.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Нарисовать lifecycle Future и написать 3 async-функции","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.backend.tokio","title":"Tokio basics","description":"Runtime, tasks, async I/O, channels, timeout, select.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Переписать TCP echo-server на Tokio","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.backend.http","title":"HTTP server","description":"HTTP semantics, routing, JSON, middleware; использовать современный Rust web stack.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":3,"next_action":"Сделать HTTP API поверх части Ferrum store","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.backend.observability","title":"Tracing и metrics","description":"Structured logs, spans, counters/histograms, request IDs.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":4,"next_action":"Добавить tracing и измерить latency основных операций","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.backend.cancellation","title":"Cancellation и shutdown","description":"Timeouts, cancellation safety, graceful shutdown.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":5,"next_action":"Сделать Ctrl-C shutdown без потери принятых запросов","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.backend.async-compare","title":"Threads vs async","description":"Сравнить модели по коду, памяти, latency и throughput.","node_type":"checkpoint","status":"not_started","needs_review":false,"confidence":1,"position":6,"next_action":"Снять одинаковый benchmark blocking и async версий и написать вывод","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.backend.backend-checkpoint","title":"Project v2: Ferrum service","description":"Async network service с HTTP admin API, observability и benchmark suite.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":7,"next_action":"Опубликовать v2 с README, архитектурой и результатами benchmark","target_date":null,"estimated_hours":9,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "rust.advanced",
+      "title": "Продвинутый Rust и направления",
+      "description": "Закрепить язык и попробовать области, которые тебе интересны.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 8,
+      "next_action": "Написать небольшой declarative macro для повторяющегося кода",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"rust.advanced.macros","title":"Macros","description":"macro_rules!, derive/proc macros на уровне понимания и использования.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Написать небольшой declarative macro для повторяющегося кода","target_date":null,"estimated_hours":3,"children":[]},
+        {"seed_key":"rust.advanced.wasm","title":"WebAssembly","description":"wasm target, browser/WASI concepts, граница JS/Rust.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Скомпилировать маленькую библиотеку в WASM и вызвать её","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.advanced.embedded","title":"Embedded taste","description":"no_std, ownership без ОС, HAL concept; без покупки железа на старте.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":3,"next_action":"Собрать no_std пример под подходящий target или emulator","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.advanced.tui","title":"TUI","description":"Event loop, terminal UI, state updates.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":4,"next_action":"Сделать TUI-клиент для Ferrum server","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.advanced.devops-cli","title":"DevOps CLI","description":"Config, subprocesses, SSH/API integration concept, packaging.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":5,"next_action":"Сделать CLI для health/status/benchmark Ferrum","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.advanced.profiling","title":"Profiling и optimization","description":"Measure first, allocation awareness, release profile, flamegraphs/perf concepts.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":6,"next_action":"Найти один bottleneck benchmark-ом и доказать улучшение числами","target_date":null,"estimated_hours":4,"children":[]},
+        {"seed_key":"rust.advanced.advanced-checkpoint","title":"Финал: Ferrum","description":"Сервер + TUI/CLI + benchmarks + документация + demo; объяснить ownership и concurrency решения.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":7,"next_action":"Подготовить release v1.0 и технический разбор архитектуры","target_date":null,"estimated_hours":11,"children":[]}
+      ]
+    }
+  ],
+  "dependencies": [
+    {"node_seed_key":"rust.nvim.vim-motions","depends_on_seed_key":"rust.terminal.terminal-checkpoint"},
+    {"node_seed_key":"rust.rust-core.toolchain","depends_on_seed_key":"rust.nvim.nvim-checkpoint"},
+    {"node_seed_key":"rust.ownership.memory-refresh","depends_on_seed_key":"rust.rust-core.core-checkpoint"},
+    {"node_seed_key":"rust.systems.files-io","depends_on_seed_key":"rust.ownership.ownership-checkpoint"},
+    {"node_seed_key":"rust.networking.tcp-basics","depends_on_seed_key":"rust.systems.systems-checkpoint"},
+    {"node_seed_key":"rust.backend.async-model","depends_on_seed_key":"rust.networking.network-checkpoint"},
+    {"node_seed_key":"rust.advanced.macros","depends_on_seed_key":"rust.backend.backend-checkpoint"}
+  ]
+}
