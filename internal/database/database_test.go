@@ -39,8 +39,15 @@ func TestMigrateAndSeedAreIdempotent(t *testing.T) {
 	if err := db.QueryRow(`SELECT COUNT(*) FROM node_dependencies`).Scan(&dependenciesBefore); err != nil {
 		t.Fatal(err)
 	}
-	if directionsBefore != 1 || nodesBefore == 0 || dependenciesBefore == 0 {
+	if directionsBefore != 2 || nodesBefore == 0 || dependenciesBefore == 0 {
 		t.Fatalf("incomplete seed: directions=%d nodes=%d dependencies=%d", directionsBefore, nodesBefore, dependenciesBefore)
+	}
+	var rustNodes int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM roadmap_nodes WHERE seed_key LIKE 'rust.%'`).Scan(&rustNodes); err != nil {
+		t.Fatal(err)
+	}
+	if rustNodes == 0 {
+		t.Fatal("rust roadmap was not seeded")
 	}
 	if _, err := db.Exec(`DELETE FROM roadmap_nodes WHERE seed_key = 'backend-go.backend-foundations.dns'`); err != nil {
 		t.Fatal(err)
