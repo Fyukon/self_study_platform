@@ -1,0 +1,260 @@
+{
+  "seed_key": "math-for-programmers",
+  "title": "Математика для программиста: 14 дней",
+  "description": "Короткий практический интенсив на 14 дней по 2 часа. Цель — быстро освежить полезную математику через код, симуляции и небольшие эксперименты. Базовый ритм дня: 30–40 минут теории, 70–80 минут практики, 10 минут заметок. Если тема уже знакома — сократить теорию и отдать время практике. Сквозной приём: сначала получить или оценить ответ математически, затем проверить его программой. Python удобен для симуляций и графиков; Rust можно брать как дополнительный challenge.",
+  "nodes": [
+    {
+      "seed_key": "math-for-programmers.day-01",
+      "title": "День 1. Логика, инварианты и асимптотика",
+      "description": "Быстро освежить язык рассуждений, который постоянно встречается в алгоритмах: утверждения, кванторы, контрпримеры, индукция, инварианты и Big-O.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 1,
+      "next_action": "Сформулировать инвариант бинарного поиска и проверить сложность экспериментом",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-01.concepts","title":"Короткий разбор: доказательство как инструмент программиста","description":"Освежить: импликация, необходимые и достаточные условия, кванторы, доказательство от противного, контрпример, математическая индукция, инвариант цикла, O/Ω/Θ на уровне смысла.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Выписать по одному примеру контрпримера, индукции и инварианта из программирования","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-01.practice","title":"Практика: бинарный поиск и рост функций","description":"Объяснить, почему бинарный поиск корректен через инвариант. Затем измерить время/число операций для линейного и бинарного поиска на растущих входах и сопоставить эксперимент с O(n) и O(log n).","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Сделать таблицу размеров входа, числа шагов и короткий вывод","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-02",
+      "title": "День 2. Комбинаторика",
+      "description": "Научиться быстро считать количество вариантов без перебора и видеть, когда задача сводится к сумме, произведению, сочетаниям или inclusion-exclusion.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 2,
+      "next_action": "Посчитать poker hands и проверить формулы brute force на маленьком пространстве",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-02.concepts","title":"Короткий разбор: считать вместо перебирать","description":"Правила суммы и произведения, перестановки, размещения и сочетания, биномиальные коэффициенты, принцип Дирихле, inclusion-exclusion. Рекуррентные соотношения — только идея.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Решить 5 коротких задач на выбор правильного способа подсчёта","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-02.practice","title":"Практика: poker, пароли и пути","description":"Формулами посчитать несколько типов poker hands, число паролей с ограничениями и число путей по сетке. Для уменьшенного пространства написать brute force и сверить ответы.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Получить минимум три совпадения: формула = программа","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-03",
+      "title": "День 3. Графы",
+      "description": "Освежить базовую дискретную структуру для зависимостей, маршрутов, сетей, планировщиков и состояния программ.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 3,
+      "next_action": "Сгенерировать лабиринт и найти в нём путь",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-03.concepts","title":"Короткий разбор: граф, дерево, DAG","description":"Вершины и рёбра, связность, дерево, цикл, DAG, BFS/DFS, кратчайший путь в невзвешенном графе, топологический порядок. Сосредоточиться на моделировании задачи графом.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Для трёх реальных задач описать вершины и рёбра","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-03.practice","title":"Практика: лабиринт как граф","description":"Сгенерировать небольшой лабиринт DFS-алгоритмом или взять готовую сетку, затем найти путь BFS. Вывести длину пути и визуализировать маршрут текстом или графически.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Получить лабиринт, маршрут и объяснить, почему BFS даёт кратчайший путь","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-04",
+      "title": "День 4. Вероятность: база",
+      "description": "Вернуть интуицию случайности: события, условная вероятность, независимость, матожидание и дисперсия — с обязательной проверкой симуляцией.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 4,
+      "next_action": "Симулировать Monty Hall и birthday paradox и сравнить с расчётом",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-04.concepts","title":"Короткий разбор: события и ожидание","description":"Пространство исходов, вероятность события, условная вероятность, независимость, матожидание, дисперсия. Формулы брать через смысл и маленькие примеры.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Решить 4 коротких задачи на условную вероятность и ожидание","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-04.practice","title":"Практика: Monty Hall + birthday paradox","description":"Написать две симуляции на десятках/сотнях тысяч запусков. Перед запуском записать теоретический прогноз, после — сравнить частоты с расчётом и объяснить расхождение при малом N.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Получить график или таблицу сходимости экспериментальной вероятности","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-05",
+      "title": "День 5. Байес и распределения",
+      "description": "Связать обновление убеждений с данными и быстро вспомнить несколько распределений, которые встречаются в моделях, очередях и экспериментах.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 5,
+      "next_action": "Собрать игрушечный Bayesian spam classifier",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-05.concepts","title":"Короткий разбор: Bayes + типовые распределения","description":"Формула Байеса через обновление prior→posterior. Bernoulli, binomial, geometric, Poisson и normal — когда какое распределение естественно возникает и какие параметры важны.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Для каждого распределения придумать программистский пример","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-05.practice","title":"Практика: naive Bayes на маленьком корпусе","description":"Взять небольшой набор сообщений, посчитать частоты слов для spam/ham и классифицировать новые сообщения через naive Bayes. Не нужны библиотеки ML: цель — руками почувствовать posterior.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Классифицировать 10 новых сообщений и разобрать две ошибки модели","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-06",
+      "title": "День 6. Monte Carlo и случайные процессы",
+      "description": "Посмотреть, как из простых случайных экспериментов получать численные оценки и почему средние стабилизируются.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 6,
+      "next_action": "Оценить π Monte Carlo и исследовать ошибку при росте числа испытаний",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-06.concepts","title":"Короткий разбор: LLN, CLT, random walk","description":"Закон больших чисел, центральная предельная теорема на уровне интуиции, стандартная ошибка, случайное блуждание, идея Monte Carlo. Связать точность с количеством экспериментов.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Объяснить своими словами разницу LLN и CLT","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-06.practice","title":"Практика: Monte Carlo и random walk","description":"Оценить π случайными точками для разных N; затем симулировать одномерное random walk. Посмотреть, как меняется ошибка и типичный масштаб отклонения при росте числа шагов.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Построить два графика и написать 5 строк вывода о сходимости","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-07",
+      "title": "День 7. Статистика и A/B-тесты",
+      "description": "Разобрать минимум статистики, который нужен для экспериментов: оценка, неопределённость, ложные срабатывания и мощность.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 7,
+      "next_action": "Написать симулятор A/B-теста и измерить false positive rate",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-07.concepts","title":"Короткий разбор: от выборки к решению","description":"Выборка и генеральная совокупность, оценка параметра, confidence interval, нулевая гипотеза, p-value, ошибки I/II рода, power. Корреляция не равна причинности — на одном хорошем примере.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Сформулировать H0/H1 и ошибки I/II рода для продуктового эксперимента","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-07.practice","title":"Checkpoint: симулятор A/B-теста","description":"Сгенерировать две группы с одинаковой конверсией и много раз провести тест. Измерить долю ложных побед. Затем добавить реальный uplift и посмотреть, как размер выборки влияет на способность его заметить.","node_type":"checkpoint","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Показать false positive rate и power минимум для трёх размеров выборки","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-08",
+      "title": "День 8. Линейная алгебра и геометрия",
+      "description": "Освежить векторы и матрицы через преобразования, чтобы матричная запись перестала быть абстрактной таблицей чисел.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 8,
+      "next_action": "Написать 2D-преобразования точек матрицами",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-08.concepts","title":"Короткий разбор: векторы и линейные преобразования","description":"Вектор, норма, dot product, угол, матрица как преобразование, умножение матриц, система линейных уравнений, базис и ранг. Eigenvalues/eigenvectors — только геометрическая интуиция.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"На бумаге преобразовать три точки масштабированием и поворотом","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-08.practice","title":"Практика: мини-2D renderer","description":"Задать набор точек фигуры и реализовать матрицы масштабирования, поворота и переноса через homogeneous coordinates. Нарисовать несколько кадров или вывести координаты до/после.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Собрать композицию нескольких преобразований и проверить порядок умножения","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-09",
+      "title": "День 9. Производные и оптимизация",
+      "description": "Вспомнить анализ через задачу поиска минимума: скорость изменения, градиент, chain rule и локальная аппроксимация.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 9,
+      "next_action": "Реализовать gradient descent без библиотек оптимизации",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-09.concepts","title":"Короткий разбор: производная как локальная модель","description":"Производная, частная производная, gradient, chain rule, extrema, Taylor approximation на уровне идеи. Связать градиент с направлением наиболее быстрого роста.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Вручную найти градиент двух простых функций","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-09.practice","title":"Практика: gradient descent","description":"Реализовать спуск для функции двух переменных. Поиграть learning rate: нормальная сходимость, слишком маленький шаг, расходимость. Сохранить траекторию точек и, если удобно, визуализировать.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Сравнить минимум три learning rate и объяснить поведение","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-10",
+      "title": "День 10. Диффуры: динамика и Euler",
+      "description": "Посмотреть на дифференциальное уравнение как на правило изменения состояния во времени и сразу перейти к численной симуляции.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 10,
+      "next_action": "Реализовать Euler method для logistic growth",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-10.concepts","title":"Короткий разбор: ODE как закон изменения","description":"Что означает dx/dt, initial value problem, exponential growth/decay, logistic equation, идея численного шага Euler. Не тратить время на классификацию десятков типов ОДУ.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Из словесного описания роста вывести две простые ODE","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-10.practice","title":"Практика: logistic growth","description":"Реализовать Euler method для экспоненциального и логистического роста. Менять dt и параметры модели, смотреть на устойчивость и ошибку; где возможно — сравнить с известным точным решением.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Показать, как выбор dt меняет ошибку или устойчивость решения","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-11",
+      "title": "День 11. Системы диффуров и RK4",
+      "description": "Перейти от одной переменной к динамическим системам и увидеть, почему более точный численный метод часто радикально меняет качество симуляции.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 11,
+      "next_action": "Сравнить Euler и RK4 на осцилляторе или модели хищник–жертва",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-11.concepts","title":"Короткий разбор: динамическая система и RK4","description":"Система ODE, фазовое пространство, устойчивость численного метода, идея Runge–Kutta 4 без вывода коэффициентов. Примеры: harmonic oscillator и Lotka–Volterra.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Переписать уравнение второго порядка как систему первого порядка","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-11.practice","title":"Практика: Euler vs RK4","description":"Выбрать пружину/осциллятор или Lotka–Volterra. Реализовать Euler и RK4, прогнать с одинаковым шагом и сравнить траектории. Найти режим, где Euler заметно врёт.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Сохранить сравнение двух методов и объяснить разницу","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-12",
+      "title": "День 12. Теория информации",
+      "description": "Связать вероятность с количеством информации, кодированием и сжатием данных.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 12,
+      "next_action": "Реализовать Huffman coding и сравнить среднюю длину кода с entropy",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-12.concepts","title":"Короткий разбор: bits, entropy, coding","description":"Self-information, Shannon entropy, prefix codes, идея оптимального кодирования. Cross-entropy/KL divergence — только смысл и один пример, без глубокого ML.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Посчитать entropy для честной и сильно смещённой монеты","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-12.practice","title":"Практика: Huffman coding","description":"По частотам символов построить Huffman tree, закодировать короткий текст и сравнить размер с fixed-width кодом. Сопоставить среднее число бит на символ с entropy источника.","node_type":"project","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Получить коэффициент сжатия и объяснить связь с распределением символов","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-13",
+      "title": "День 13. Теория игр: стратегии и равновесия",
+      "description": "Разобрать, как формализовать конфликт интересов и выбирать стратегию, когда результат зависит от действий нескольких игроков.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 13,
+      "next_action": "Разобрать несколько payoff matrices и написать minimax для маленькой игры",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-13.concepts","title":"Короткий разбор: Nash, mixed strategies, minimax","description":"Payoff matrix, best response, dominated strategy, Nash equilibrium, zero-sum games, mixed strategies, minimax. Идея alpha-beta pruning — как связь с алгоритмами.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Найти best responses и Nash equilibria в трёх матрицах 2×2","target_date":null,"estimated_hours":0.5,"children":[]},
+        {"seed_key":"math-for-programmers.day-13.practice","title":"Практика: minimax","description":"Реализовать minimax для небольшой детерминированной игры: например, несколько состояний Nim или упрощённые крестики-нолики. Сравнить полный перебор с alpha-beta pruning, если останется время.","node_type":"practice","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Получить стратегию, которая не проигрывает из заданной позиции","target_date":null,"estimated_hours":1.5,"children":[]}
+      ]
+    },
+    {
+      "seed_key": "math-for-programmers.day-14",
+      "title": "День 14. Повторяющиеся игры: турнир стратегий",
+      "description": "Финал интенсива: объединить теорию игр, вероятность, статистику и программирование в одном эксперименте.",
+      "node_type": "section",
+      "status": "not_started",
+      "needs_review": false,
+      "confidence": 1,
+      "position": 14,
+      "next_action": "Провести турнир стратегий Iterated Prisoner's Dilemma с шумом",
+      "target_date": null,
+      "estimated_hours": 0,
+      "children": [
+        {"seed_key":"math-for-programmers.day-14.concepts","title":"Короткий разбор: repeated games и эволюция стратегий","description":"Iterated Prisoner's Dilemma, retaliation/forgiveness, discounting на уровне идеи, evolutionary stability и влияние ошибок. Стратегии: Always Cooperate, Always Defect, Tit for Tat, Grim Trigger, Random, Pavlov.","node_type":"concept","status":"not_started","needs_review":false,"confidence":1,"position":1,"next_action":"Предсказать победителя турнира без шума и с шумом","target_date":null,"estimated_hours":0.4,"children":[]},
+        {"seed_key":"math-for-programmers.day-14.project","title":"Финальный checkpoint: Prisoner's Dilemma tournament","description":"Реализовать минимум 6 стратегий, провести round-robin турнир на многих повторениях, затем добавить вероятность ошибки действия. Сравнить результаты, устойчивость рейтинга и поведение стратегий. В конце написать коротко: какие 3 математические идеи из 14 дней хочется изучить глубже.","node_type":"checkpoint","status":"not_started","needs_review":false,"confidence":1,"position":2,"next_action":"Получить таблицу турнира без шума и с шумом и сделать выводы","target_date":null,"estimated_hours":1.6,"children":[]}
+      ]
+    }
+  ],
+  "dependencies": [
+    {"node_seed_key":"math-for-programmers.day-02","depends_on_seed_key":"math-for-programmers.day-01"},
+    {"node_seed_key":"math-for-programmers.day-03","depends_on_seed_key":"math-for-programmers.day-02"},
+    {"node_seed_key":"math-for-programmers.day-04","depends_on_seed_key":"math-for-programmers.day-03"},
+    {"node_seed_key":"math-for-programmers.day-05","depends_on_seed_key":"math-for-programmers.day-04"},
+    {"node_seed_key":"math-for-programmers.day-06","depends_on_seed_key":"math-for-programmers.day-05"},
+    {"node_seed_key":"math-for-programmers.day-07","depends_on_seed_key":"math-for-programmers.day-06"},
+    {"node_seed_key":"math-for-programmers.day-08","depends_on_seed_key":"math-for-programmers.day-07"},
+    {"node_seed_key":"math-for-programmers.day-09","depends_on_seed_key":"math-for-programmers.day-08"},
+    {"node_seed_key":"math-for-programmers.day-10","depends_on_seed_key":"math-for-programmers.day-09"},
+    {"node_seed_key":"math-for-programmers.day-11","depends_on_seed_key":"math-for-programmers.day-10"},
+    {"node_seed_key":"math-for-programmers.day-12","depends_on_seed_key":"math-for-programmers.day-11"},
+    {"node_seed_key":"math-for-programmers.day-13","depends_on_seed_key":"math-for-programmers.day-12"},
+    {"node_seed_key":"math-for-programmers.day-14","depends_on_seed_key":"math-for-programmers.day-13"}
+  ]
+}
