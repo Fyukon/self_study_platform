@@ -2,7 +2,8 @@ package seeds
 
 import "embed"
 
-// Files contains data imported on the first application start.
+// Files contains roadmap data imported on the first application start.
+// Each JSON file is an independent idempotent roadmap seed.
 //
-//go:embed backend_go_roadmap.json
+//go:embed *.json
 var Files embed.FS
