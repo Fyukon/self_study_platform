@@ -120,12 +120,29 @@ type seedNode struct {
 }
 
 type seedDependency struct {
-	NodeSeedKey      string `json:"node_seed_key"`
+	NodeSeedKey       string `json:"node_seed_key"`
 	DependsOnSeedKey string `json:"depends_on_seed_key"`
 }
 
 func Seed(ctx context.Context, db *sql.DB) error {
-	body, err := seeds.Files.ReadFile("backend_go_roadmap.json")
+	entries, err := seeds.Files.ReadDir(".")
+	if err != nil {
+		return fmt.Errorf("list seeds: %w", err)
+	}
+	sort.Slice(entries, func(i, j int) bool { return entries[i].Name() < entries[j].Name() })
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".json") {
+			continue
+		}
+		if err := seedRoadmapFile(ctx, db, entry.Name()); err != nil {
+			return fmt.Errorf("seed %s: %w", entry.Name(), err)
+		}
+	}
+	return nil
+}
+
+func seedRoadmapFile(ctx context.Context, db *sql.DB, name string) error {
+	body, err := seeds.Files.ReadFile(name)
 	if err != nil {
 		return fmt.Errorf("read seed: %w", err)
 	}
